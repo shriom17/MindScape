@@ -1,0 +1,65 @@
+/* Full page background */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: url('./loginbg.jpg') no-repeat center center fixed;
+  background-size: cover;
+}
+
+/* Optional wrapper to ensure layout consistency */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Transparent form styling */
+.login-container {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+  width: 100%;
+  max-width: 360px;
+  text-align: center;
+  color: #fff;
+}
+
+input {
+  width: 90%;
+  padding: 12px;
+  margin: 10px 0;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+input::placeholder {
+  color: #ddd;
+}
+
+button {
+  width: 95%;
+  padding: 12px;
+  margin-top: 12px;
+  background-color: #4b7bec;
+  color: #fff;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #3867d6;
+}
+
+.error {
+  color: #ff6b6b;
+  margin-top: 10px;
+}

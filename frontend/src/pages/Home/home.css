@@ -1,0 +1,60 @@
+/* Home.css */
+.home-layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+
+.main-content {
+  flex: 1;
+  padding: 40px;
+  justify-content: center;
+  background: #2c334e;
+}
+
+.prompt-section {
+  width: auto;
+  color:aquamarine;
+  padding-top: 10%;
+  padding-left: 20%;
+}
+
+.chat-panel {
+  width: 400px;
+  background: #3e68b8;
+  border-left: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+}
+
+.scan-btn {
+  background-color: #113f13;
+  color: white;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 10px;
+  size: 20px;
+}
+.scan-btn:disabled {
+  background-color: #a5d6a7;
+  cursor: not-allowed;
+}
+.stop-btn {
+  background-color: #571814;
+  color: white;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: 10px;
+}
+.stop-btn:hover {
+  background-color: #571212;
+}
