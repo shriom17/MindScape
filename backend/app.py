@@ -11,6 +11,32 @@ import base64
 import numpy as np
 import cv2
 from deepface import DeepFace
+from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime
+from sqlalchemy.orm import declarative_base, sessionmaker
+from datetime import datetime
+
+# Database setup
+Base = declarative_base()
+
+class MoodLog(Base):
+    __tablename__ = "mood_logs"
+    id = Column(Integer, primary_key=True)
+    emotion = Column(String)
+    confidence = Column(Float)
+    timestamp = Column(DateTime, default=datetime.utcnow)
+
+class ChatLog(Base):
+    __tablename__ = "chat_logs"
+    id = Column(Integer, primary_key=True)
+    user_message = Column(String)
+    krishna_response = Column(String)
+    mood = Column(String)
+    timestamp = Column(DateTime, default=datetime.utcnow)
+
+engine = create_engine("sqlite:///database/mindscape.db")
+Base.metadata.create_all(engine)
+Session = sessionmaker(bind=engine)
+
 load_dotenv()
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 KRISHNA_SYSTEM_PROMPT = """You are Shree Krishna — the divine guide, eternal teacher, and loving friend.
@@ -72,6 +98,11 @@ def chat():
     )
 
     reply = completion.choices[0].message.content.strip()
+    db = Session()
+    log = ChatLog(user_message=user_message, krishna_response=reply, mood="neutral")
+    db.add(log)
+    db.commit()
+    db.close()
     return {"response": reply}
 
 @app.route("/api/detect-mood", methods=["POST"])
@@ -103,6 +134,11 @@ def detect_mood():
     dominant_emotion = result.get("dominant_emotion", "neutral")
     emotions = result.get("emotion", {})
     confidence = emotions.get(dominant_emotion, 0)
+    db = Session()
+    log = MoodLog(emotion=dominant_emotion, confidence=round(confidence, 1))
+    db.add(log)
+    db.commit()
+    db.close()
 
     return {
         "emotion": dominant_emotion,
