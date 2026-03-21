@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request
 from flask_cors import CORS
 from dotenv import load_dotenv
 from groq import Groq
@@ -23,6 +23,26 @@ load_dotenv()
 @app.route("/api/health")
 def health():
     return {"status": "ok", "message": "MindScape is alive!"}
+
+@app.route("/api/chat", methods=["POST"])
+def chat():
+    data = request.get_json()
+    user_message = data.get("message", "")
+
+    if not user_message:
+        return {"error": "No message provided"}, 400
+    completion = client.chat.completions.create(
+        model="llama-3.1-8b-instant",
+        messages=[
+            {"role": "system", "content": KRISHNA_SYSTEM_PROMPT},
+            {"role": "user", "content": user_message}
+        ],
+        max_tokens=150,
+        temperature=0.75,
+    )
+
+    reply = completion.choices[0].message.content.strip()
+    return {"response": reply}
 
 if __name__ == "__main__":
     print("MindScape backend starting...")
