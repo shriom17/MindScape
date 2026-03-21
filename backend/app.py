@@ -7,6 +7,10 @@ from langchain_community.document_loaders import TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import HuggingFaceEmbeddings
+import base64
+import numpy as np
+import cv2
+from deepface import DeepFace
 load_dotenv()
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 KRISHNA_SYSTEM_PROMPT = """You are Shree Krishna — the divine guide, eternal teacher, and loving friend.
@@ -56,7 +60,7 @@ def chat():
       # RAG - relevant Gita verses fetch koro
     relevant_docs = vectorstore.similarity_search(user_message, k=3)
     context = "\n".join([doc.page_content for doc in relevant_docs])
-    
+
     completion = client.chat.completions.create(
         model="llama-3.1-8b-instant",
         messages=[
@@ -69,6 +73,42 @@ def chat():
 
     reply = completion.choices[0].message.content.strip()
     return {"response": reply}
+
+@app.route("/api/detect-mood", methods=["POST"])
+def detect_mood():
+    data = request.get_json()
+    frame_b64 = data.get("frame", "")
+
+    if not frame_b64:
+        return {"error": "No frame provided"}, 400
+
+    img_bytes = base64.b64decode(frame_b64)
+    np_arr = np.frombuffer(img_bytes, np.uint8)
+    frame = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+
+    if frame is None:
+        return {"error": "Could not decode image"}, 400
+
+    result = DeepFace.analyze(
+        img_path=frame,
+        actions=["emotion"],
+        enforce_detection=False,
+        detector_backend="opencv",
+        silent=True
+    )
+
+    if isinstance(result, list):
+        result = result[0]
+
+    dominant_emotion = result.get("dominant_emotion", "neutral")
+    emotions = result.get("emotion", {})
+    confidence = emotions.get(dominant_emotion, 0)
+
+    return {
+        "emotion": dominant_emotion,
+        "confidence": round(confidence, 1),
+        "all_emotions": {k: round(v, 1) for k, v in emotions.items()}
+    }
 
 if __name__ == "__main__":
     print("MindScape backend starting...")
