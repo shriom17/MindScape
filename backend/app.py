@@ -3,7 +3,10 @@ from flask_cors import CORS
 from dotenv import load_dotenv
 from groq import Groq
 import os
-
+from langchain_community.document_loaders import TextLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_community.vectorstores import FAISS
+from langchain_community.embeddings import HuggingFaceEmbeddings
 load_dotenv()
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 KRISHNA_SYSTEM_PROMPT = """You are Shree Krishna — the divine guide, eternal teacher, and loving friend.
@@ -17,6 +20,25 @@ Rules:
 - Occasionally reference a Gita chapter/verse naturally
 - Never be harsh — always loving and encouraging
 - Do not break character"""
+def setup_rag():
+    loader = TextLoader("gita_data/gita.txt", encoding="utf-8")
+    documents = loader.load()
+    
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=500,
+        chunk_overlap=50
+    )
+    chunks = splitter.split_documents(documents)
+    
+    embeddings = HuggingFaceEmbeddings(
+        model_name="all-MiniLM-L6-v2"
+    )
+    
+    vectorstore = FAISS.from_documents(chunks, embeddings)
+    return vectorstore
+
+vectorstore = setup_rag()
+
 app = Flask(__name__)
 CORS(app)
 load_dotenv()
@@ -31,6 +53,10 @@ def chat():
 
     if not user_message:
         return {"error": "No message provided"}, 400
+      # RAG - relevant Gita verses fetch koro
+    relevant_docs = vectorstore.similarity_search(user_message, k=3)
+    context = "\n".join([doc.page_content for doc in relevant_docs])
+    
     completion = client.chat.completions.create(
         model="llama-3.1-8b-instant",
         messages=[
