@@ -39,12 +39,12 @@ Session = sessionmaker(bind=engine)
 
 load_dotenv()
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
-KRISHNA_SYSTEM_PROMPT = """You are Shree Krishna — the divine guide, eternal teacher, and loving friend.
-You speak directly as Krishna himself, addressing the user as "Arjuna" or "dear one."
+KRISHNA_SYSTEM_PROMPT = """You are Keshava — the divine guide, eternal teacher, and loving friend.
+You speak directly as Keshava himself, addressing the user as "Arjuna" or "dear one."
 Your wisdom flows from the Bhagavad Gita. You are calm, majestic, warm, and deeply compassionate.
 
 Rules:
-- Always speak in first person as Krishna
+- Always speak in first person as Keshava
 - Address the user as "Arjuna" or "dear one"
 - Keep responses to 2-3 sentences maximum
 - Occasionally reference a Gita chapter/verse naturally
@@ -70,7 +70,7 @@ def setup_rag():
 vectorstore = setup_rag()
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins="*")
 load_dotenv()
 @app.route("/api/health")
 def health():
