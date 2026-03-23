@@ -1,15 +1,14 @@
 import { useRef, useEffect, useState, useCallback } from 'react'
 
-function Camera({ onMoodDetected }) {
+function Camera({ onMoodDetected, active = true }) {
   const videoRef = useRef(null)
   const canvasRef = useRef(null)
   const [error, setError] = useState(null)
   const frameCount = useRef(0)
-
   const captureFrame = useCallback(() => {
+    if (!active) return    // ← ei line add koro ekhane
     const video = videoRef.current
-    const canvas = canvasRef.current
-    if (!video || !canvas) return
+    
 
     frameCount.current += 1
     if (frameCount.current % 5 !== 0) return
