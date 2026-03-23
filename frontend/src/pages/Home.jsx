@@ -39,8 +39,8 @@ function Home() {
       </h1>
 
       {/* Camera — shudhu cameraOn hole show korbe */}
-      {cameraOn && (
-        <Camera onMoodDetected={(data) => setMood(data)} active={scanning} />
+      {cameraOn && scanning && (
+       <Camera onMoodDetected={(data) => setMood(data)} active={scanning} />
       )}
 
       {/* Start Button */}
