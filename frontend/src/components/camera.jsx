@@ -35,13 +35,26 @@ function Camera({ onMoodDetected, active = true }) {
   }, [onMoodDetected])
 
   useEffect(() => {
+    let interval
+    let stream
+
     navigator.mediaDevices.getUserMedia({ video: true })
-      .then(stream => {
-        videoRef.current.srcObject = stream
-        const interval = setInterval(captureFrame, 500)
-        return () => clearInterval(interval)
+      .then(s => {
+        stream = s
+        videoRef.current.srcObject = s
+        interval = setInterval(captureFrame, 500)
       })
       .catch(() => setError("Camera access denied!"))
+
+    return () => {
+      clearInterval(interval)
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop())
+      }
+      if (videoRef.current) {
+        videoRef.current.srcObject = null
+      }
+    }
   }, [captureFrame])
 
   return (
