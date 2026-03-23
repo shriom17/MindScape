@@ -141,10 +141,10 @@ def detect_mood():
     db.close()
 
     return {
-        "emotion": dominant_emotion,
-        "confidence": round(confidence, 1),
-        "all_emotions": {k: round(v, 1) for k, v in emotions.items()}
-    }
+    "emotion": str(dominant_emotion),
+    "confidence": float(round(float(confidence), 1)),
+    "all_emotions": {k: float(round(float(v), 1)) for k, v in emotions.items()}
+}
 
 if __name__ == "__main__":
     print("MindScape backend starting...")
