@@ -3,12 +3,33 @@ import { useRef, useEffect, useState, useCallback } from 'react'
 function Camera({ onMoodDetected, active = true }) {
   const videoRef = useRef(null)
   const canvasRef = useRef(null)
+  const streamRef = useRef(null)
+  const intervalRef = useRef(null)
   const [error, setError] = useState(null)
   const frameCount = useRef(0)
+
+  const stopCamera = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current)
+      intervalRef.current = null
+    }
+
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop())
+      streamRef.current = null
+    }
+
+    if (videoRef.current) {
+      videoRef.current.srcObject = null
+    }
+  }, [])
+
   const captureFrame = useCallback(() => {
-    if (!active) return    // ← ei line add koro ekhane
+    if (!active) return
     const video = videoRef.current
-    
+    const canvas = canvasRef.current
+
+    if (!video || !canvas || video.readyState < 2) return
 
     frameCount.current += 1
     if (frameCount.current % 5 !== 0) return
@@ -32,30 +53,37 @@ function Camera({ onMoodDetected, active = true }) {
         }
       })
       .catch(() => {})
-  }, [onMoodDetected])
+  }, [active, onMoodDetected])
 
   useEffect(() => {
-    let interval
-    let stream
+    let cancelled = false
+
+    if (!active) {
+      stopCamera()
+      return
+    }
 
     navigator.mediaDevices.getUserMedia({ video: true })
-      .then(s => {
-        stream = s
-        videoRef.current.srcObject = s
-        interval = setInterval(captureFrame, 500)
+      .then(stream => {
+        if (cancelled || !active) {
+          stream.getTracks().forEach(track => track.stop())
+          return
+        }
+
+        streamRef.current = stream
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream
+        }
+
+        intervalRef.current = setInterval(captureFrame, 500)
       })
-      .catch(() => setError("Camera access denied!"))
+      .catch(() => setError('Camera access denied!'))
 
     return () => {
-      clearInterval(interval)
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop())
-      }
-      if (videoRef.current) {
-        videoRef.current.srcObject = null
-      }
+      cancelled = true
+      stopCamera()
     }
-  }, [captureFrame])
+  }, [active, captureFrame, stopCamera])
 
   return (
     <div style={{
