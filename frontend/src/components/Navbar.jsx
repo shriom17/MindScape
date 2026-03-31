@@ -15,20 +15,9 @@ function Navbar() {
         🧠 MindScape
       </div>
 
-      {/* Nav Links */}
-      <div style={{ display: 'flex', gap: '2rem' }}>
-        {['/', '/tracker', '/stories', '/music', '/dashboard'].map((path, i) => (
-          <Link
-            key={path}
-            to={path}
-            style={{ color: '#e2e8f0', textDecoration: 'none', fontSize: '1rem' }}
-          >
-            {['Home', 'Tracker', 'Stories', 'Music', 'Dashboard'][i]}
-          </Link>
-        ))}
-      </div>
+      {/* Nav Links removed; now handled by Sidebar */}
 
-      {/* Right side */}
+      {/* Right side: Profile, Settings, Lang, Login/Logout */}
       <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
         <button style={{
           backgroundColor: '#16213e',
@@ -48,6 +37,27 @@ function Navbar() {
           borderRadius: '8px',
           boxShadow: '3px 3px 6px #0d0d1a, -3px -3px 6px #252545'
         }}>👤 Profile</Link>
+
+        <button style={{
+          backgroundColor: '#16213e',
+          color: '#e2e8f0',
+          border: 'none',
+          padding: '0.5rem 1rem',
+          borderRadius: '8px',
+          cursor: 'pointer',
+          boxShadow: '3px 3px 6px #0d0d1a, -3px -3px 6px #252545'
+        }}>⚙️ Settings</button>
+
+        <button style={{
+          backgroundColor: '#16213e',
+          color: '#e2e8f0',
+          border: 'none',
+          padding: '0.5rem 1rem',
+          borderRadius: '8px',
+          cursor: 'pointer',
+          boxShadow: '3px 3px 6px #0d0d1a, -3px -3px 6px #252545'
+        }}>🔓 Login</button>
+        {/* Logout button can be conditionally rendered if user is logged in */}
       </div>
     </nav>
   )
