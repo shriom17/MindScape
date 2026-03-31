@@ -80,7 +80,7 @@ function Home() {
       )}
 
       {/* Result */}
-      {scanComplete && mood && (
+      {scanComplete && mood?.emotion && (
         <>
           <MoodDisplay mood={mood} />
           <button onClick={startScan} style={{
