@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Camera from '../components/Camera'
 import MoodDisplay from '../components/MoodDisplay'
 import FloatingChat from '../components/FloatingChat'
+import { pageBgStyles } from '../styles/pageBackground'
 
 function Home() {
   const [mood, setMood] = useState(null)
@@ -31,8 +32,11 @@ function Home() {
   }, [countdown, scanning])
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center gap-8 p-8"
-      style={{ backgroundColor: '#1a1a2e' }}>
+    <div style={pageBgStyles.page}>
+      <div style={{ ...pageBgStyles.orbBase, ...pageBgStyles.orbLeft }} />
+      <div style={{ ...pageBgStyles.orbBase, ...pageBgStyles.orbRight }} />
+
+      <div className="min-h-screen flex flex-col items-center justify-center gap-8 p-8" style={{ position: 'relative', zIndex: 1 }}>
 
       <h1 className="text-3xl font-bold text-amber-400">
         How are you feeling today, Arjuna?
@@ -98,6 +102,7 @@ function Home() {
       )}
 
       <FloatingChat mood={mood} />
+      </div>
     </div>
   )
 }

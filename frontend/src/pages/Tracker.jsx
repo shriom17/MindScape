@@ -1,5 +1,6 @@
 import { useState } from "react";
 import FloatingChat from "../components/FloatingChat";
+import { pageBgStyles } from '../styles/pageBackground';
 
 const moods = [
   { icon: "🙂", value: "happy" },
@@ -33,15 +34,19 @@ function Tracker() {
   };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        background: "linear-gradient(135deg, #0f172a, #1e3a8a)",
-      }}
-    >
+    <div style={pageBgStyles.page}>
+      <div style={{ ...pageBgStyles.orbBase, ...pageBgStyles.orbLeft }} />
+      <div style={{ ...pageBgStyles.orbBase, ...pageBgStyles.orbRight }} />
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          position: 'relative',
+          zIndex: 1,
+        }}
+      >
       <div
         style={{
           width: 400,
@@ -164,6 +169,7 @@ function Tracker() {
         )}
       </div>
       <FloatingChat />
+      </div>
     </div>
   );
 }
