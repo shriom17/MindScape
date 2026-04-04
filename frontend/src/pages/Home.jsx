@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import Camera from '../components/Camera'
-import MoodDisplay from '../components/MoodDisplay'
+import Camera from '../components/camera'
+import MoodDisplay from '../components/mooddisplay'
 import FloatingChat from '../components/FloatingChat'
 import { pageBgStyles } from '../styles/pageBackground'
 
