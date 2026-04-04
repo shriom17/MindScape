@@ -212,11 +212,7 @@ function Music() {
           </article>
         </div>
 
-        <div style={styles.chatRow}>
-          <button type="button" onClick={() => setIsChatOpen(!isChatOpen)} style={styles.chatBtn}>
-            {isChatOpen ? 'Close Chat' : 'Open Chat'}
-          </button>
-        </div>
+        
       </section>
 
       <FloatingChat isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
