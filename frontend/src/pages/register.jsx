@@ -7,8 +7,9 @@ function Register() {
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [mode, setMode] = useState("signup");
 
-  const handleRegister = async (e) => {
+  const handleAuth = async (e) => {
     e.preventDefault();
 
     if (!username.trim() || !password.trim()) {
@@ -21,7 +22,10 @@ function Register() {
     setMessage("");
 
     try {
-      const response = await fetch(apiUrl("/register"), {
+      const endpoint = mode === "signup" ? "/register" : "/login";
+      const actionText = mode === "signup" ? "Registration" : "Login";
+
+      const response = await fetch(apiUrl(endpoint), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -35,13 +39,15 @@ function Register() {
       const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error(data?.message || "Registration failed. Try again.");
+        throw new Error(data?.message || `${actionText} failed. Try again.`);
       }
 
       setIsError(false);
-      setMessage(data?.message || "Registration successful.");
-      setUsername("");
-      setPassword("");
+      setMessage(data?.message || `${actionText} successful.`);
+      if (mode === "signup") {
+        setUsername("");
+        setPassword("");
+      }
     } catch (error) {
       setIsError(true);
       setMessage(error.message || "Something went wrong.");
@@ -62,7 +68,7 @@ function Register() {
       }}
     >
       <form
-        onSubmit={handleRegister}
+        onSubmit={handleAuth}
         style={{
           width: "100%",
           maxWidth: 420,
@@ -75,9 +81,55 @@ function Register() {
           backdropFilter: "blur(6px)",
         }}
       >
-        
+        <div
+          style={{
+            display: "flex",
+            gap: "0.6rem",
+            marginBottom: "1rem",
+          }}
+        >
+          <button
+            type="button"
+            onClick={() => {
+              setMode("signup");
+              setMessage("");
+            }}
+            style={{
+              flex: 1,
+              padding: "0.6rem",
+              borderRadius: 8,
+              border: mode === "signup" ? "1px solid rgba(245, 158, 11, 0.5)" : "1px solid #334155",
+              background: mode === "signup" ? "#f59e0b" : "#0f172a",
+              color: mode === "signup" ? "#0f172a" : "#e2e8f0",
+              fontWeight: mode === "signup" ? 700 : 600,
+              cursor: "pointer",
+            }}
+          >
+            Sign Up
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setMode("login");
+              setMessage("");
+            }}
+            style={{
+              flex: 1,
+              padding: "0.6rem",
+              borderRadius: 8,
+              border: mode === "login" ? "1px solid rgba(245, 158, 11, 0.5)" : "1px solid #334155",
+              background: mode === "login" ? "#f59e0b" : "#0f172a",
+              color: mode === "login" ? "#0f172a" : "#e2e8f0",
+              fontWeight: mode === "login" ? 700 : 600,
+              cursor: "pointer",
+            }}
+          >
+            Login
+          </button>
+        </div>
+
         <h2 style={{ marginTop: 0, marginBottom: "1rem", color: "#f59e0b" }}>
-          Create Account
+          {mode === "signup" ? "Create Account" : "Welcome Back"}
         </h2>
 
         <label style={{ display: "block", marginBottom: "0.35rem" }} htmlFor="username">
@@ -108,7 +160,7 @@ function Register() {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          autoComplete="new-password"
+          autoComplete={mode === "signup" ? "new-password" : "current-password"}
           style={{
             width: "100%",
             marginBottom: "1rem",
@@ -134,7 +186,7 @@ function Register() {
             cursor: loading ? "not-allowed" : "pointer",
           }}
         >
-          {loading ? "Registering..." : "Register"}
+          {loading ? (mode === "signup" ? "Registering..." : "Logging in...") : mode === "signup" ? "Register" : "Login"}
         </button>
 
         {message && (
