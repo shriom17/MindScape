@@ -7,6 +7,7 @@ import Music from './pages/Music'
 import Profile from './pages/Profile'
 import Navbar from './components/Navbar'
 import Sidebar from './components/Sidebar'
+import Register from './pages/register'
 
 function App() {
   return (
@@ -22,6 +23,8 @@ function App() {
             <Route path="/stories" element={<Stories />} />
             <Route path="/music" element={<Music />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/register" element={<Register />} />
+
           </Routes>
         </div>
       </div>
