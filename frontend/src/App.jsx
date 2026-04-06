@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import Home from './pages/Home'
 import Dashboard from './pages/Dashboard'
 import Tracker from './pages/Tracker'
@@ -9,13 +9,16 @@ import Navbar from './components/Navbar'
 import Sidebar from './components/Sidebar'
 import Register from './pages/register'
 
-function App() {
+function AppLayout() {
+  const location = useLocation()
+  const isRegisterPage = location.pathname === '/register'
+
   return (
-    <BrowserRouter>
+    <>
       <Navbar />
       <div style={{ display: 'flex' }}>
-        <Sidebar />
-        <div style={{ flex: 1, marginLeft: 180 }}>
+        {!isRegisterPage && <Sidebar />}
+        <div style={{ flex: 1, marginLeft: isRegisterPage ? 0 : 180 }}>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/dashboard" element={<Dashboard />} />
@@ -24,10 +27,17 @@ function App() {
             <Route path="/music" element={<Music />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/register" element={<Register />} />
-
           </Routes>
         </div>
       </div>
+    </>
+  )
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AppLayout />
     </BrowserRouter>
   )
 }

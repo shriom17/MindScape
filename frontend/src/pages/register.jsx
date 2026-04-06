@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { apiUrl } from "../services/api";
+import heroImage from "../assets/regbg.jpg";
 
 function Register() {
   const [username, setUsername] = useState("");
@@ -59,18 +60,52 @@ function Register() {
   return (
     <div
       style={{
-        minHeight: "100vh",
+        minHeight: "calc(100vh - 72px)",
         display: "flex",
-        alignItems: "center",
+        alignItems: "stretch",
         justifyContent: "center",
         background: "linear-gradient(135deg, #040d27, #5a83c1, #07246a)",
-        padding: "1rem",
+        padding: "1.25rem",
+        gap: "1rem",
+        flexWrap: "wrap",
       }}
     >
+      <div
+        style={{
+          flex: "1 1 420px",
+          minHeight: 520,
+          maxWidth: 640,
+          borderRadius: 14,
+          border: "1px solid rgba(245, 158, 11, 0.25)",
+          boxShadow: "0 8px 24px rgba(0, 0, 0, 0.35)",
+          position: "relative",
+          overflow: "hidden",
+          backgroundImage: `linear-gradient(130deg, rgba(4, 13, 39, 0.8), rgba(15, 23, 42, 0.72)), url(${heroImage})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          display: "flex",
+          alignItems: "flex-end",
+        }}
+      >
+        <div
+          style={{
+            padding: "1.4rem",
+            color: "#e2e8f0",
+            width: "100%",
+            background: "linear-gradient(0deg, rgba(2, 6, 23, 0.8), rgba(2, 6, 23, 0.02))",
+          }}
+        >
+          <h2 style={{ margin: 0, color: "#f59e0b", fontSize: "1.8rem" }}>MindScape Auth</h2>
+          <p style={{ marginTop: "0.45rem", marginBottom: 0, lineHeight: 1.5 }}>
+            Your calm space starts here. Sign up or log in to continue your mood journey.
+          </p>
+        </div>
+      </div>
+
       <form
         onSubmit={handleAuth}
         style={{
-          width: "100%",
+          flex: "1 1 360px",
           maxWidth: 420,
           background: "rgba(22, 33, 62, 0.85)",
           border: "1px solid rgba(245, 158, 11, 0.3)",
@@ -79,6 +114,7 @@ function Register() {
           padding: "1.5rem",
           color: "#e2e8f0",
           backdropFilter: "blur(6px)",
+          alignSelf: "center",
         }}
       >
         <div
