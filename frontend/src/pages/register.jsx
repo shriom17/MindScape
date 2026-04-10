@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { apiUrl } from "../services/api";
-import heroImage from "../assets/regbg.jpg";
+import heroImage from "../assets/loginbg.png";
 
 function Register() {
   const [username, setUsername] = useState("");
@@ -9,6 +9,56 @@ function Register() {
   const [isError, setIsError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState("signup");
+  const googleButtonRef = useRef(null);
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
+  useEffect(() => {
+    if (!googleClientId || !googleButtonRef.current) {
+      return;
+    }
+
+    const initializeGoogleButton = () => {
+      if (!window.google?.accounts?.id || !googleButtonRef.current) {
+        return;
+      }
+
+      window.google.accounts.id.initialize({
+        client_id: googleClientId,
+        callback: (response) => {
+          if (response?.credential) {
+            setIsError(false);
+            setMessage("Google sign-in received. Connect backend callback to complete login.");
+          }
+        },
+      });
+
+      window.google.accounts.id.renderButton(googleButtonRef.current, {
+        theme: "outline",
+        size: "large",
+        shape: "rectangular",
+        width: 360,
+        text: mode === "signup" ? "signup_with" : "signin_with",
+      });
+    };
+
+    if (window.google?.accounts?.id) {
+      initializeGoogleButton();
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://accounts.google.com/gsi/client";
+    script.async = true;
+    script.defer = true;
+    script.onload = initializeGoogleButton;
+    document.head.appendChild(script);
+
+    return () => {
+      if (script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
+    };
+  }, [googleClientId, mode]);
 
   const handleAuth = async (e) => {
     e.preventDefault();
@@ -73,30 +123,32 @@ function Register() {
       <div
         style={{
           flex: "1 1 420px",
-          minHeight: 520,
-          maxWidth: 640,
+          minHeight: 500,
+          maxWidth: 800,
           borderRadius: 14,
           border: "1px solid rgba(245, 158, 11, 0.25)",
-          boxShadow: "0 8px 24px rgba(0, 0, 0, 0.35)",
+          boxShadow: "0 8px 24px rgba(0, 0, 0, 0.09)",
           position: "relative",
           overflow: "hidden",
           backgroundImage: `linear-gradient(130deg, rgba(4, 13, 39, 0.8), rgba(15, 23, 42, 0.72)), url(${heroImage})`,
-          backgroundSize: "cover",
+          backgroundSize: "contain",
+          backgroundRepeat: "no-repeat",
           backgroundPosition: "center",
+          backgroundColor: "#577ced",
           display: "flex",
           alignItems: "flex-end",
         }}
       >
         <div
           style={{
-            padding: "1.4rem",
+            padding: "0.4rem",
             color: "#e2e8f0",
             width: "100%",
             background: "linear-gradient(0deg, rgba(2, 6, 23, 0.8), rgba(2, 6, 23, 0.02))",
           }}
         >
-          <h2 style={{ margin: 0, color: "#f59e0b", fontSize: "1.8rem" }}>MindScape Auth</h2>
-          <p style={{ marginTop: "0.45rem", marginBottom: 0, lineHeight: 1.5 }}>
+          <h1 style={{ margin: 0, color: "#f59e0b", fontSize: "1.8rem" }}>MindScape</h1>
+          <p style={{ marginTop: "0.45rem", marginBottom: 0, lineHeight: 2.5 }}>
             Your calm space starts here. Sign up or log in to continue your mood journey.
           </p>
         </div>
@@ -162,6 +214,37 @@ function Register() {
           >
             Login
           </button>
+        </div>
+
+        <div style={{ marginBottom: "1rem" }}>
+          <div
+            ref={googleButtonRef}
+            style={{
+              minHeight: 44,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          />
+
+          {!googleClientId && (
+            <button
+              type="button"
+              disabled
+              style={{
+                width: "100%",
+                marginTop: "0.6rem",
+                padding: "0.7rem",
+                borderRadius: 10,
+                border: "1px solid #334155",
+                background: "#0b1220",
+                color: "#94a3b8",
+                cursor: "not-allowed",
+              }}
+            >
+              Sign In with Google Account
+            </button>
+          )}
         </div>
 
         <h2 style={{ marginTop: 0, marginBottom: "1rem", color: "#f59e0b" }}>
