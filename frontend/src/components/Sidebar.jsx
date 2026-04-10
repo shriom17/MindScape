@@ -4,7 +4,9 @@ import { Home, Activity, BookOpen, Music, LayoutDashboard } from "lucide-react";
 
 function Sidebar() {
   return (
-    <div className="w-64 h-screen fixed top-[75px] left-0 bg-gradient-to-br from-[#030d2b] to-[#295ca8] text-white p-5 shadow-lg">
+    <div
+      className="w-70  min-h-screen bg-gradient-to-br from-[#030d2b] to-[#295ca8] text-white p-5 shadow-lg"
+    >
 
 
       {/* Menu */}

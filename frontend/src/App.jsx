@@ -18,7 +18,7 @@ function AppLayout() {
       <Navbar />
       <div style={{ display: 'flex' }}>
         {!isRegisterPage && <Sidebar />}
-        <div style={{ flex: 1, marginLeft: isRegisterPage ? 0 : 180 }}>
+        <div style={{ flex: 1 }}>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/dashboard" element={<Dashboard />} />
