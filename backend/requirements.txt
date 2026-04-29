@@ -11,3 +11,4 @@ langchain-groq==0.2.0
 faiss-cpu==1.9.0.post1
 sentence-transformers
 sqlalchemy==2.0.31
+# requests removed (previously used for Spotify integration)

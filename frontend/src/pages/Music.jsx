@@ -1,10 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import FloatingChat from '../components/FloatingChat';
 import { pageBgStyles } from '../styles/pageBackground';
 
 function Music() {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [selectMusic, setSelectMusic] = useState('');
+  const [jamendoTracks, setJamendoTracks] = useState([]);
+  const audioRef = useRef(null)
+  const [currentPlaying, setCurrentPlaying] = useState(null)
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [currentTime, setCurrentTime] = useState(0)
+  const [duration, setDuration] = useState(0)
 
   const musicList = [
     { id: 1, title: 'Morning Drift', artist: 'Ari Sol' },
@@ -14,6 +20,76 @@ function Music() {
   ];
 
   const currentSong = musicList.find(song => song.id === Number(selectMusic));
+
+  useEffect(() => {
+    // optional: preload Jamendo results
+    // fetchMusic()
+  }, [])
+
+  async function fetchMusic() {
+    try {
+      const res = await fetch(
+        "https://api.jamendo.com/v3.0/tracks/?client_id=d4f850a4&format=json&tags=calm&limit=10"
+      )
+      const data = await res.json()
+      setJamendoTracks(data.results || [])
+      console.log(data.results)
+    } catch (e) {
+      console.error('Jamendo fetch error', e)
+    }
+  }
+
+  function playJamendo(track) {
+    if (!track || !track.audio) return alert('No audio URL')
+    if (!audioRef.current) audioRef.current = new Audio()
+    // if same track toggle play
+    if (currentPlaying && currentPlaying.id === track.id && audioRef.current.src === track.audio) {
+      audioRef.current.play()
+      setIsPlaying(true)
+      return
+    }
+    audioRef.current.src = track.audio
+    audioRef.current.play()
+    setCurrentPlaying(track)
+    setIsPlaying(true)
+  }
+
+  function togglePlayPause() {
+    if (!audioRef.current) return
+    if (isPlaying) {
+      audioRef.current.pause()
+      setIsPlaying(false)
+    } else {
+      audioRef.current.play()
+      setIsPlaying(true)
+    }
+  }
+
+  // attach listeners to update play state
+  useEffect(() => {
+    const a = audioRef.current
+    if (!a) return
+    const onPlay = () => setIsPlaying(true)
+    const onPause = () => setIsPlaying(false)
+    const onEnded = () => {
+      setIsPlaying(false)
+      setCurrentPlaying(null)
+    }
+    const onTime = () => setCurrentTime(a.currentTime || 0)
+    const onLoaded = () => setDuration(a.duration || 0)
+    a.addEventListener('play', onPlay)
+    a.addEventListener('pause', onPause)
+    a.addEventListener('ended', onEnded)
+    a.addEventListener('timeupdate', onTime)
+    a.addEventListener('loadedmetadata', onLoaded)
+    return () => {
+      a.removeEventListener('play', onPlay)
+      a.removeEventListener('pause', onPause)
+      a.removeEventListener('ended', onEnded)
+      a.removeEventListener('timeupdate', onTime)
+      a.removeEventListener('loadedmetadata', onLoaded)
+    }
+  }, [audioRef.current])
 
   const styles = {
     shell: {
@@ -157,11 +233,18 @@ function Music() {
         <div>
           <p style={styles.eyebrow}>MindScape Audio</p>
           <h2 style={styles.title}>Music Lounge</h2>
-          <p style={styles.subtitle}>Spotify API integration-ready layout with curated mood playlist slots.</p>
+          <p style={styles.subtitle}>Jamendo integration — free tracks for mood-based listening.</p>
         </div>
 
         <div style={styles.controls}>
-          <label htmlFor="song-select">Pick a track</label>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <label htmlFor="song-select">Pick a track</label>
+            <div>
+              <button type="button" onClick={fetchMusic} style={{ ...styles.chatBtn, marginLeft: 8 }}>
+                Load Jamendo
+              </button>
+            </div>
+          </div>
           <select id="song-select" value={selectMusic} onChange={e => setSelectMusic(e.target.value)} style={styles.select}>
             <option value="">Select a song</option>
             {musicList.map(song => (
@@ -191,31 +274,101 @@ function Music() {
             </ul>
           </article>
 
+          
+
           <article style={styles.card}>
-            <h3>Now Playing</h3>
-            {currentSong ? (
-              <>
-                <p style={styles.songTitle}>{currentSong.title}</p>
-                <p style={styles.songArtist}>{currentSong.artist}</p>
-                <div style={styles.actions}>
-                  <button type="button" style={styles.primaryBtn}>
-                    Play
-                  </button>
-                  <button type="button" style={styles.ghostBtn}>
-                    Queue
-                  </button>
-                </div>
-              </>
+            <h3>Jamendo Results</h3>
+            {jamendoTracks.length === 0 ? (
+              <p style={styles.muted}>No Jamendo tracks loaded — click "Load Jamendo".</p>
             ) : (
-              <p style={styles.muted}>Select a track to start previewing here.</p>
+              <ul style={styles.list}>
+                {jamendoTracks.map(t => (
+                  <li key={t.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <div style={{ fontWeight: 600 }}>{t.name}</div>
+                      <div style={styles.smallArtist}>{t.artist_name}</div>
+                    </div>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <button type="button" style={styles.primaryBtn} onClick={() => playJamendo(t)}>
+                        Play
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
             )}
           </article>
+
+          {/* Now Playing moved to bottom fixed player bar */}
         </div>
 
         
       </section>
 
       <FloatingChat isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
+
+      {/* Bottom player bar */}
+      <div
+        style={{
+          position: 'fixed',
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(11, 28, 41, 0.95)',
+          color: '#f8fbff',
+          borderTop: '1px solid rgba(255,255,255,0.06)',
+          padding: '0.6rem 1rem',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+          zIndex: 1000,
+        }}
+      >
+        <div style={{ flex: 1 }}>
+          {currentPlaying ? (
+            <>
+              <div style={{ fontWeight: 700 }}>{currentPlaying.name}</div>
+              <div style={{ color: '#93c5fd', fontSize: 12 }}>{currentPlaying.artist_name}</div>
+            </>
+          ) : (
+            <div style={{ color: '#bfdbfe' }}>No track playing</div>
+          )}
+        </div>
+
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+          <button type="button" onClick={togglePlayPause} style={styles.primaryBtn}>
+            {isPlaying ? 'Pause' : 'Play'}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              if (audioRef.current) {
+                audioRef.current.pause()
+                audioRef.current.currentTime = 0
+              }
+              setIsPlaying(false)
+              setCurrentPlaying(null)
+              setCurrentTime(0)
+            }}
+            style={styles.ghostBtn}
+          >
+            Stop
+          </button>
+        </div>
+
+        <div style={{ width: 240, marginLeft: 12 }}>
+          <div style={{ height: 6, background: 'rgba(255,255,255,0.08)', borderRadius: 6, overflow: 'hidden' }}>
+            <div
+              style={{
+                height: '100%',
+                background: '#facc15',
+                width: duration ? `${(currentTime / duration) * 100}%` : '0%',
+                transition: 'width 0.2s linear',
+              }}
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
