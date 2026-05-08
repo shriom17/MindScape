@@ -1,4 +1,7 @@
-from groq import Groq
+try:
+    from groq import Groq
+except ImportError:  # Optional dependency for hosted LLM responses.
+    Groq = None
 
 from config import GROQ_API_KEY
 
@@ -14,10 +17,21 @@ Rules:
 - Never be harsh - always loving and encouraging
 - Do not break character"""
 
-client = Groq(api_key=GROQ_API_KEY)
+client = Groq(api_key=GROQ_API_KEY) if Groq and GROQ_API_KEY else None
 
 
 def generate_response(user_message, context):
+    if client is None:
+        trimmed_context = (context or "").strip()
+        if trimmed_context:
+            return (
+                "Keshava's guidance is available in fallback mode. "
+                "I am with you, dear one. Reflect on the context shared and take one calm step forward."
+            )
+        return (
+            "I am with you, dear one. Breathe, steady your mind, and take the next small right action."
+        )
+
     completion = client.chat.completions.create(
         model="llama-3.1-8b-instant",
         messages=[
