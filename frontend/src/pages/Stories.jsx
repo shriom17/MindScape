@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { apiUrl } from '../services/api'
 import { pageBgStyles } from '../styles/pageBackground'
@@ -21,6 +21,29 @@ const tagBase = {
   background: 'rgba(15,23,42,0.6)',
   border: '1px solid rgba(148,163,184,0.25)',
   color: '#e2e8f0',
+}
+
+const previewSummary = summary => {
+  const text = (summary || '').trim()
+  if (!text) return ''
+  const lines = text.split('\n').map(line => line.trim()).filter(Boolean)
+  const preview = lines.slice(0, 2).join(' ')
+  return preview.length > 180 ? `${preview.slice(0, 177).trimEnd()}...` : preview
+}
+
+const storyDetailLines = summary => {
+  const text = (summary || '').trim()
+  if (!text) return []
+
+  const newlineLines = text.split('\n').map(line => line.trim()).filter(Boolean)
+  if (newlineLines.length > 1) return newlineLines
+
+  const sentenceLines = text
+    .split(/(?<=[.!?])\s+/)
+    .map(line => line.trim())
+    .filter(Boolean)
+
+  return sentenceLines.length ? sentenceLines : [text]
 }
 
 const getUserId = () => {
@@ -51,6 +74,7 @@ function Stories() {
   const [moodStories, setMoodStories] = useState([])
   const [trendingStories, setTrendingStories] = useState([])
   const [savedStories, setSavedStories] = useState([])
+  const [selectedStory, setSelectedStory] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -59,44 +83,44 @@ function Stories() {
     [savedStories]
   )
 
-  const loadLatestMood = async () => {
+  const loadLatestMood = useCallback(async () => {
     try {
       const data = await fetchJson('/api/moods/latest')
       if (data?.emotion) {
         setActiveMood(data.emotion)
         return data.emotion
       }
-    } catch (err) {
+    } catch {
       return ''
     }
     return ''
-  }
+  }, [])
 
-  const loadStories = async moodValue => {
+  const loadStories = useCallback(async moodValue => {
     const query = moodValue ? `?mood=${encodeURIComponent(moodValue)}` : ''
     const data = await fetchJson(`/api/stories${query}`)
     setMoodStories(data.stories || [])
-  }
+  }, [])
 
-  const loadTrending = async () => {
+  const loadTrending = useCallback(async () => {
     const data = await fetchJson('/api/stories/trending')
     setTrendingStories(data.stories || [])
-  }
+  }, [])
 
-  const loadSaved = async () => {
+  const loadSaved = useCallback(async () => {
     const data = await fetchJson(`/api/users/${userId}/saved-stories`)
     setSavedStories(data.stories || [])
-  }
+  }, [userId])
 
-  const ensureDemoStories = async () => {
+  const ensureDemoStories = useCallback(async () => {
     try {
       await fetchJson('/api/stories/seed-demo', { method: 'POST' })
-    } catch (err) {
+    } catch {
       // Ignore demo seed errors to keep page usable.
     }
-  }
+  }, [])
 
-  const refreshAll = async moodValue => {
+  const refreshAll = useCallback(async moodValue => {
     try {
       setLoading(true)
       setError('')
@@ -107,7 +131,7 @@ function Stories() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [ensureDemoStories, loadSaved, loadStories, loadTrending])
 
   useEffect(() => {
     const init = async () => {
@@ -115,7 +139,7 @@ function Stories() {
       await refreshAll(mood)
     }
     init()
-  }, [])
+  }, [loadLatestMood, refreshAll])
 
   const handleMoodSelect = mood => {
     setActiveMood(mood)
@@ -142,34 +166,66 @@ function Stories() {
     await Promise.all([loadStories(activeMood), loadTrending()])
   }
 
+  const openStory = async story => {
+    setSelectedStory(story)
+
+    try {
+      const data = await fetchJson(`/api/stories/${story.id}`)
+      setSelectedStory(data.story || story)
+    } catch {
+      // Keep the modal open with the list item content if the detail fetch fails.
+    }
+
+    try {
+      await viewStory(story)
+    } catch {
+      // Keep the modal usable even if view tracking fails.
+    }
+  }
+
+  const closeStory = () => {
+    setSelectedStory(null)
+  }
+
   const renderStoryCard = (story, accent) => (
     <div key={story.id} style={{ ...cardBase, borderColor: accent }}>
-      <div style={{ display: 'flex', gap: 16 }}>
-        {story.image_url ? (
-          <img
-            src={story.image_url}
-            alt={story.title}
-            style={{
-              width: 96,
-              height: 96,
-              objectFit: 'cover',
-              borderRadius: 14,
-              border: '1px solid rgba(148,163,184,0.3)',
-            }}
-          />
-        ) : null}
-        <div style={{ flex: 1 }}>
-          <h3 style={{ margin: 0, color: '#f1f5f9', fontSize: 18 }}>{story.title}</h3>
-          <p style={{ margin: '6px 0 10px', color: '#cbd5f5', fontSize: 14 }}>
-            {story.summary}
-          </p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
-            {story.mood_tags?.slice(0, 4).map(tag => (
-              <span key={`${story.id}-${tag}`} style={tagBase}>
-                {tag}
-              </span>
-            ))}
+      <div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
+          <div style={{ flex: 1 }}>
+            <h3 style={{ margin: 0, color: '#f1f5f9', fontSize: 18 }}>{story.title}</h3>
+            <p
+              style={{
+                margin: '6px 0 10px',
+                color: '#cbd5f5',
+                fontSize: 14,
+                lineHeight: 1.75,
+                whiteSpace: 'pre-wrap',
+              }}
+            >
+              {previewSummary(story.summary)}
+            </p>
           </div>
+          {story.image_url ? (
+            <span
+              aria-hidden="true"
+              style={{
+                width: 10,
+                minWidth: 10,
+                height: 10,
+                borderRadius: 999,
+                marginTop: 8,
+                background: accent,
+                boxShadow: `0 0 0 6px ${accent.replace('0.35', '0.08')}`,
+              }}
+            />
+          ) : null}
+        </div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          {story.mood_tags?.slice(0, 4).map(tag => (
+            <span key={`${story.id}-${tag}`} style={tagBase}>
+              {tag}
+            </span>
+          ))}
         </div>
       </div>
       <div
@@ -186,7 +242,7 @@ function Stories() {
         <div style={{ display: 'flex', gap: 10 }}>
           <button
             type="button"
-            onClick={() => viewStory(story)}
+            onClick={() => openStory(story)}
             style={{
               background: 'transparent',
               border: '1px solid rgba(148,163,184,0.4)',
@@ -330,6 +386,91 @@ function Stories() {
           </div>
         </div>
       </section>
+
+      {selectedStory ? (
+        <div
+          role="presentation"
+          onClick={closeStory}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(2,6,23,0.78)',
+            backdropFilter: 'blur(10px)',
+            display: 'grid',
+            placeItems: 'center',
+            padding: '20px',
+            zIndex: 50,
+          }}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label={selectedStory.title}
+            onClick={event => event.stopPropagation()}
+            style={{
+              width: 'min(760px, 100%)',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+              background: 'linear-gradient(180deg, rgba(15,23,42,0.98), rgba(2,6,23,0.98))',
+              border: '1px solid rgba(148,163,184,0.18)',
+              borderRadius: 24,
+              boxShadow: '0 24px 80px rgba(0,0,0,0.45)',
+              padding: '1.4rem 1.5rem',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16 }}>
+              <div>
+                <h2 style={{ margin: 0, color: '#f8fafc', fontSize: '1.8rem' }}>
+                  {selectedStory.title}
+                </h2>
+                <p style={{ margin: '0.5rem 0 0', color: '#cbd5e1', fontSize: 14 }}>
+                  {selectedStory.read_time_minutes || 4} min read • {selectedStory.views || 0} views • {selectedStory.likes || 0} likes
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={closeStory}
+                style={{
+                  background: 'rgba(148,163,184,0.12)',
+                  border: '1px solid rgba(148,163,184,0.24)',
+                  color: '#e2e8f0',
+                  borderRadius: 999,
+                  padding: '6px 12px',
+                  cursor: 'pointer',
+                  height: 'fit-content',
+                }}
+              >
+                Close
+              </button>
+            </div>
+
+            <div style={{ marginTop: 18 }}>
+              {storyDetailLines(selectedStory.summary)
+                .map((line, index) => (
+                  <p
+                    key={`${selectedStory.id}-line-${index}`}
+                    style={{
+                      margin: index === 0 ? 0 : '0.85rem 0 0',
+                      color: '#dbeafe',
+                      fontSize: 15,
+                      lineHeight: 1.9,
+                    }}
+                  >
+                    {line}
+                  </p>
+                ))}
+            </div>
+
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 18 }}>
+              {selectedStory.mood_tags?.map(tag => (
+                <span key={`modal-${selectedStory.id}-${tag}`} style={tagBase}>
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   )
 }

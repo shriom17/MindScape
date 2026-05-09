@@ -5,3 +5,5 @@ sqlalchemy==2.0.31
 
 # Optional ML / LLM stack is kept separate so the backend can start on a
 # lightweight Python environment without building numpy/faiss/tensorflow.
+feedparser==6.0.10
+beautifulsoup4==4.12.2
