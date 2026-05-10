@@ -237,44 +237,48 @@ function Register() {
         <h2 style={{ marginTop: 0, marginBottom: "1rem", color: "#f59e0b" }}>
           {mode === "signup" ? "Create Account" : "Welcome Back"}
         </h2>
-        <label style={{ display: "block", marginBottom: "0.35rem" }} htmlFor="birthdate">
-          Birthdate
-        </label>
-        <input
-          id="birthdate"
-          type="date"
-          value={birthdate}
-          onChange={(e) => setBirthdate(e.target.value)}
-          max={new Date().toISOString().split("T")[0]}
-          style={{
-            width: "100%",
-            marginBottom: "0.9rem",
-            padding: "0.7rem",
-            borderRadius: 8,
-            border: "1px solid #334155",
-            background: "#0f172a",
-            color: "#e2e8f0",
-          }}
-        />
-        <label style={{ display: "block", marginBottom: "0.35rem" }} htmlFor="name">
-          Name
-        </label>
-        <input
-          id="name"
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          autoComplete="name"
-          style={{
-            width: "100%",
-            marginBottom: "0.9rem",
-            padding: "0.7rem",
-            borderRadius: 8,
-            border: "1px solid #334155",
-            background: "#0f172a",
-            color: "#e2e8f0",
-          }}
-        />
+        {mode === "signup" && (
+          <>
+            <label style={{ display: "block", marginBottom: "0.35rem" }} htmlFor="birthdate">
+              Birthdate
+            </label>
+            <input
+              id="birthdate"
+              type="date"
+              value={birthdate}
+              onChange={(e) => setBirthdate(e.target.value)}
+              max={new Date().toISOString().split("T")[0]}
+              style={{
+                width: "100%",
+                marginBottom: "0.9rem",
+                padding: "0.7rem",
+                borderRadius: 8,
+                border: "1px solid #334155",
+                background: "#0f172a",
+                color: "#e2e8f0",
+              }}
+            />
+            <label style={{ display: "block", marginBottom: "0.35rem" }} htmlFor="name">
+              Name
+            </label>
+            <input
+              id="name"
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              autoComplete="name"
+              style={{
+                width: "100%",
+                marginBottom: "0.9rem",
+                padding: "0.7rem",
+                borderRadius: 8,
+                border: "1px solid #334155",
+                background: "#0f172a",
+                color: "#e2e8f0",
+              }}
+            />
+          </>
+        )}
         <label style={{ display: "block", marginBottom: "0.35rem" }} htmlFor="email">
           Email
         </label>
