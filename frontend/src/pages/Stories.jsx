@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { apiUrl } from '../services/api'
+import { fetchJson } from '../services/api'
+import { supabase } from '../services/supabaseClient'
 import { pageBgStyles } from '../styles/pageBackground'
 
 const MOOD_OPTIONS = ['happy', 'sad', 'angry', 'fear', 'surprise', 'neutral', 'calm']
@@ -54,19 +55,6 @@ const getUserId = () => {
   return next
 }
 
-const fetchJson = async (path, options = {}) => {
-  const response = await fetch(apiUrl(path), {
-    headers: { 'Content-Type': 'application/json' },
-    ...options,
-  })
-
-  const payload = await response.json().catch(() => ({}))
-  if (!response.ok) {
-    const message = payload?.error || 'Request failed'
-    throw new Error(message)
-  }
-  return payload
-}
 
 function Stories() {
   const userId = useMemo(() => getUserId(), [])
@@ -140,6 +128,21 @@ function Stories() {
     }
     init()
   }, [loadLatestMood, refreshAll])
+
+  useEffect(() => {
+    // Sync Supabase user id into localStorage so legacy endpoints receive a consistent user_id
+    ;(async () => {
+      try {
+        const { data } = await supabase.auth.getUser()
+        const user = data?.user
+        if (user?.id) {
+          localStorage.setItem('mindscape_user_id', user.id)
+        }
+      } catch (e) {
+        // ignore
+      }
+    })()
+  }, [])
 
   const handleMoodSelect = mood => {
     setActiveMood(mood)

@@ -1,71 +1,21 @@
-import { useEffect, useRef, useState } from "react";
-import { apiUrl } from "../services/api";
+import { useState } from "react";
+import { signUpWithEmail, signInWithEmail, signInWithGoogle, getUser } from "../services/supabaseClient";
 import heroImage from "../assets/loginbg.png";
 
 function Register() {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState("signup");
-  const googleButtonRef = useRef(null);
-  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-
-  useEffect(() => {
-    if (!googleClientId || !googleButtonRef.current) {
-      return;
-    }
-
-    const initializeGoogleButton = () => {
-      if (!window.google?.accounts?.id || !googleButtonRef.current) {
-        return;
-      }
-
-      window.google.accounts.id.initialize({
-        client_id: googleClientId,
-        callback: (response) => {
-          if (response?.credential) {
-            setIsError(false);
-            setMessage("Google sign-in received. Connect backend callback to complete login.");
-          }
-        },
-      });
-
-      window.google.accounts.id.renderButton(googleButtonRef.current, {
-        theme: "outline",
-        size: "large",
-        shape: "rectangular",
-        width: 360,
-        text: mode === "signup" ? "signup_with" : "signin_with",
-      });
-    };
-
-    if (window.google?.accounts?.id) {
-      initializeGoogleButton();
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.src = "https://accounts.google.com/gsi/client";
-    script.async = true;
-    script.defer = true;
-    script.onload = initializeGoogleButton;
-    document.head.appendChild(script);
-
-    return () => {
-      if (script.parentNode) {
-        script.parentNode.removeChild(script);
-      }
-    };
-  }, [googleClientId, mode]);
 
   const handleAuth = async (e) => {
     e.preventDefault();
 
-    if (!username.trim() || !password.trim()) {
+    if (!email.trim() || !password.trim()) {
       setIsError(true);
-      setMessage("Username and password are required.");
+      setMessage("Email and password are required.");
       return;
     }
 
@@ -73,35 +23,31 @@ function Register() {
     setMessage("");
 
     try {
-      const endpoint = mode === "signup" ? "/register" : "/login";
-      const actionText = mode === "signup" ? "Registration" : "Login";
-
-      const response = await fetch(apiUrl(endpoint), {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: username.trim(),
-          password,
-        }),
-      });
-
-      const data = await response.json().catch(() => ({}));
-
-      if (!response.ok) {
-        throw new Error(data?.message || `${actionText} failed. Try again.`);
-      }
-
-      setIsError(false);
-      setMessage(data?.message || `${actionText} successful.`);
       if (mode === "signup") {
-        setUsername("");
+        const { data, error } = await signUpWithEmail(email.trim(), password);
+        if (error) throw error;
+        setIsError(false);
+        setMessage("Sign-up successful. Check your email if confirmation is required.");
+        setEmail("");
         setPassword("");
+      } else {
+        const { data, error } = await signInWithEmail(email.trim(), password);
+        if (error) throw error;
+        setIsError(false);
+        setMessage("Login successful.");
+        // persist user id for legacy endpoints that require user_id
+        try {
+          const user = (await getUser()) || data?.user
+          if (user?.id) {
+            localStorage.setItem('mindscape_user_id', user.id)
+          }
+        } catch (e) {
+          // ignore
+        }
       }
     } catch (error) {
       setIsError(true);
-      setMessage(error.message || "Something went wrong.");
+      setMessage(error?.message || "Something went wrong.");
     } finally {
       setLoading(false);
     }
@@ -217,49 +163,37 @@ function Register() {
         </div>
 
         <div style={{ marginBottom: "1rem" }}>
-          <div
-            ref={googleButtonRef}
+          <button
+            type="button"
+            onClick={() => signInWithGoogle()}
             style={{
-              minHeight: 44,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              width: "100%",
+              marginTop: "0.6rem",
+              padding: "0.7rem",
+              borderRadius: 10,
+              border: "1px solid #334155",
+              background: "#0b1220",
+              color: "#94a3b8",
+              cursor: "pointer",
             }}
-          />
-
-          {!googleClientId && (
-            <button
-              type="button"
-              disabled
-              style={{
-                width: "100%",
-                marginTop: "0.6rem",
-                padding: "0.7rem",
-                borderRadius: 10,
-                border: "1px solid #334155",
-                background: "#0b1220",
-                color: "#94a3b8",
-                cursor: "not-allowed",
-              }}
-            >
-              Sign In with Google Account
-            </button>
-          )}
+          >
+            Continue with Google
+          </button>
         </div>
 
         <h2 style={{ marginTop: 0, marginBottom: "1rem", color: "#f59e0b" }}>
           {mode === "signup" ? "Create Account" : "Welcome Back"}
         </h2>
 
-        <label style={{ display: "block", marginBottom: "0.35rem" }} htmlFor="username">
-          Username
+        <label style={{ display: "block", marginBottom: "0.35rem" }} htmlFor="email">
+          Email
         </label>
         <input
-          id="username"
-          type="text"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          autoComplete="username"
+          id="email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          autoComplete="email"
           style={{
             width: "100%",
             marginBottom: "0.9rem",
@@ -324,3 +258,4 @@ function Register() {
 }
 
 export default Register;
+ 

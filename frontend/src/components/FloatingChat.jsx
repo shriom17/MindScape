@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { apiUrl } from '../services/api'
+import { fetchJson } from '../services/api'
 
 function FloatingChat({ mood }) {
   const [isOpen, setIsOpen] = useState(false)
@@ -15,12 +15,10 @@ function FloatingChat({ mood }) {
     setInput('')
     setLoading(true)
 
-    const res = await fetch(apiUrl('/api/chat'), {
+    const data = await fetchJson('/api/chat', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message: input, mood: mood?.emotion || 'neutral' })
     })
-    const data = await res.json()
 
     setMessages(prev => [...prev, { role: 'Keshava', text: data.response }])
     setLoading(false)

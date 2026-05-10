@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState, useCallback } from 'react'
-import { apiUrl } from '../services/api'
+import { fetchJson } from '../services/api'
 
 function Camera({ onMoodDetected, active = true }) {
   const videoRef = useRef(null)
@@ -42,12 +42,10 @@ function Camera({ onMoodDetected, active = true }) {
 
     const frame = canvas.toDataURL('image/jpeg', 0.8).split(',')[1]
 
-    fetch(apiUrl('/api/detect-mood'), {
+    fetchJson('/api/detect-mood', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ frame })
     })
-      .then(res => res.json())
       .then(data => {
         if (data.emotion && onMoodDetected) {
           onMoodDetected(data)
