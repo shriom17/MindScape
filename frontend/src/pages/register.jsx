@@ -1,17 +1,67 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { signUpWithEmail, signInWithEmail, signInWithGoogle, getUser } from "../services/supabaseClient";
 import heroImage from "../assets/loginbg.png";
 
 function Register() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [birthdate, setBirthdate] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState("signup");
 
+  useEffect(() => {
+    let mounted = true;
+    ;(async () => {
+      try {
+        const user = await getUser();
+        if (mounted && user?.id) {
+          navigate('/');
+        }
+      } catch (e) {
+        // ignore
+      }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, [navigate]);
+
+  const calculateAge = (dobStr) => {
+    const dob = new Date(dobStr);
+    if (isNaN(dob.getTime())) return NaN;
+    const today = new Date();
+    let age = today.getFullYear() - dob.getFullYear();
+    const m = today.getMonth() - dob.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
+    return age;
+  };
+
   const handleAuth = async (e) => {
     e.preventDefault();
+
+    if (mode === "signup") {
+      if (!name.trim()) {
+        setIsError(true);
+        setMessage("Name is required.");
+        return;
+      }
+      if (!birthdate || !birthdate.toString().trim()) {
+        setIsError(true);
+        setMessage("Birthdate is required.");
+        return;
+      }
+      const computedAge = calculateAge(birthdate);
+      if (isNaN(computedAge) || computedAge <= 0) {
+        setIsError(true);
+        setMessage("Enter a valid birthdate.");
+        return;
+      }
+    }
 
     if (!email.trim() || !password.trim()) {
       setIsError(true);
@@ -28,6 +78,8 @@ function Register() {
         if (error) throw error;
         setIsError(false);
         setMessage("Sign-up successful. Check your email if confirmation is required.");
+        setName("");
+        setBirthdate("");
         setEmail("");
         setPassword("");
       } else {
@@ -37,13 +89,14 @@ function Register() {
         setMessage("Login successful.");
         // persist user id for legacy endpoints that require user_id
         try {
-          const user = (await getUser()) || data?.user
+          const user = (await getUser()) || data?.user;
           if (user?.id) {
-            localStorage.setItem('mindscape_user_id', user.id)
+            localStorage.setItem('mindscape_user_id', user.id);
           }
         } catch (e) {
           // ignore
         }
+        navigate('/');
       }
     } catch (error) {
       setIsError(true);
@@ -184,7 +237,44 @@ function Register() {
         <h2 style={{ marginTop: 0, marginBottom: "1rem", color: "#f59e0b" }}>
           {mode === "signup" ? "Create Account" : "Welcome Back"}
         </h2>
-
+        <label style={{ display: "block", marginBottom: "0.35rem" }} htmlFor="birthdate">
+          Birthdate
+        </label>
+        <input
+          id="birthdate"
+          type="date"
+          value={birthdate}
+          onChange={(e) => setBirthdate(e.target.value)}
+          max={new Date().toISOString().split("T")[0]}
+          style={{
+            width: "100%",
+            marginBottom: "0.9rem",
+            padding: "0.7rem",
+            borderRadius: 8,
+            border: "1px solid #334155",
+            background: "#0f172a",
+            color: "#e2e8f0",
+          }}
+        />
+        <label style={{ display: "block", marginBottom: "0.35rem" }} htmlFor="name">
+          Name
+        </label>
+        <input
+          id="name"
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          autoComplete="name"
+          style={{
+            width: "100%",
+            marginBottom: "0.9rem",
+            padding: "0.7rem",
+            borderRadius: 8,
+            border: "1px solid #334155",
+            background: "#0f172a",
+            color: "#e2e8f0",
+          }}
+        />
         <label style={{ display: "block", marginBottom: "0.35rem" }} htmlFor="email">
           Email
         </label>
