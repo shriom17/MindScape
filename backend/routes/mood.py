@@ -4,7 +4,10 @@ try:
     import cv2
     import numpy as np
     from deepface import DeepFace
-except Exception:  # Optional vision stack; also handles NumPy/OpenCV ABI mismatches.
+except Exception as e:  # Optional vision stack; also handles NumPy/OpenCV ABI mismatches.
+    import traceback
+    print("Vision stack import failed:", e)
+    traceback.print_exc()
     cv2 = None
     np = None
     DeepFace = None
@@ -82,3 +85,5 @@ def latest_mood():
         "confidence": latest.confidence,
         "timestamp": latest.timestamp.isoformat() if latest.timestamp else None,
     }
+
+

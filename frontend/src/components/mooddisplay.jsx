@@ -22,7 +22,9 @@ function MoodDisplay({ mood }) {
   if (!mood) return null
 
   const emotion = mood.emotion || 'neutral'
-  const confidence = mood.confidence || 0
+  // Convert confidence to percentage if it's between 0-1
+  const rawConfidence = mood.confidence || 0
+  const confidence = rawConfidence > 1 ? Math.round(rawConfidence) : Math.round(rawConfidence * 100)
   const color = colorMap[emotion] || '#94a3b8'
   const emoji = emojiMap[emotion] || '😐'
 

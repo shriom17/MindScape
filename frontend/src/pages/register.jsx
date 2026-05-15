@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { signUpWithEmail, signInWithEmail, signInWithGoogle, getUser } from "../services/supabaseClient";
+import { signUpWithEmail, signInWithEmail, signInWithGoogle, getUser, supabase } from "../services/supabaseClient";
 import heroImage from "../assets/loginbg.png";
 
 function Register() {
@@ -78,6 +78,12 @@ function Register() {
         if (error) throw error;
         setIsError(false);
         setMessage("Sign-up successful. Check your email if confirmation is required.");
+        // try to save name and birthdate into user metadata (works if session is active)
+        try {
+          await supabase.auth.updateUser({ data: { full_name: name, birthdate } })
+        } catch (e) {
+          // ignore if update fails (e.g., email confirmation required)
+        }
         setName("");
         setBirthdate("");
         setEmail("");

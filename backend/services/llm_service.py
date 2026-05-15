@@ -17,7 +17,13 @@ Rules:
 - Never be harsh - always loving and encouraging
 - Do not break character"""
 
-client = Groq(api_key=GROQ_API_KEY) if Groq and GROQ_API_KEY else None
+client = None
+if Groq and GROQ_API_KEY:
+    try:
+        client = Groq(api_key=GROQ_API_KEY)
+    except Exception:
+        # Optional hosted LLM client failed to initialize — fall back to None
+        client = None
 
 
 def generate_response(user_message, context):

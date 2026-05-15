@@ -10,6 +10,7 @@ function Home() {
   const [countdown, setCountdown] = useState(5)
   const [scanComplete, setScanComplete] = useState(false)
   const [cameraOn, setCameraOn] = useState(false)
+  const [processingError, setProcessingError] = useState(null)
 
   const startScan = () => {
     setMood(null)
@@ -17,6 +18,7 @@ function Home() {
     setCountdown(5)
     setCameraOn(true)
     setScanning(true)
+    setProcessingError(null)
   }
 
   useEffect(() => {
@@ -24,12 +26,18 @@ function Home() {
     if (countdown === 0) {
       setScanning(false)
       setScanComplete(true)
-      setCameraOn(false)
       return
     }
     const timer = setTimeout(() => setCountdown(c => c - 1), 1000)
     return () => clearTimeout(timer)
   }, [countdown, scanning])
+
+  useEffect(() => {
+    if (!scanComplete) return
+    // Keep camera on briefly so the final ML response can arrive.
+    const delayedCameraOff = setTimeout(() => setCameraOn(false), 3000)
+    return () => clearTimeout(delayedCameraOff)
+  }, [scanComplete])
 
   return (
     <div style={pageBgStyles.page}>
@@ -43,8 +51,8 @@ function Home() {
       </h1>
 
       {/* Camera — shudhu cameraOn hole show korbe */}
-      {cameraOn && scanning && (
-        <Camera onMoodDetected={setMood} active={scanning} />
+      {cameraOn && (
+        <Camera onMoodDetected={setMood} onError={setProcessingError} active={cameraOn} />
       )}
 
       {/* Start Button */}
@@ -84,20 +92,61 @@ function Home() {
       )}
 
       {/* Result */}
-      {scanComplete && mood?.emotion && (
+      {scanComplete && (
         <>
-          <MoodDisplay mood={mood} />
-          <button onClick={startScan} style={{
-            background: '#0f3460',
-            color: '#94a3b8',
-            border: 'none',
-            padding: '0.5rem 1.5rem',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            fontSize: '0.9rem'
-          }}>
-            Scan Again
-          </button>
+          {mood?.emotion ? (
+            <>
+              <MoodDisplay mood={mood} />
+              <button onClick={startScan} style={{
+                background: '#0f3460',
+                color: '#94a3b8',
+                border: 'none',
+                padding: '0.5rem 1.5rem',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '0.9rem'
+              }}>
+                Scan Again
+              </button>
+            </>
+          ) : (
+            <div style={{
+              background: '#16213e',
+              borderRadius: '16px',
+              padding: '2rem',
+              textAlign: 'center',
+              minWidth: '280px',
+              color: '#fecaca'
+            }}>
+              {processingError ? (
+                <>
+                  <p style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '1rem' }}>
+                    ⚠️ Detection Failed
+                  </p>
+                  <p style={{ fontSize: '0.9rem', marginBottom: '1rem' }}>
+                    {processingError}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p style={{ fontSize: '1rem' }}>Processing...</p>
+                  <div style={{ marginTop: '1rem', fontSize: '2rem' }}>⏳</div>
+                </>
+              )}
+              <button onClick={startScan} style={{
+                marginTop: '1rem',
+                background: '#0f3460',
+                color: '#94a3b8',
+                border: 'none',
+                padding: '0.5rem 1.5rem',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '0.9rem'
+              }}>
+                Try Again
+              </button>
+            </div>
+          )}
         </>
       )}
 

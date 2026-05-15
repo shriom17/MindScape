@@ -121,7 +121,6 @@ function Navbar() {
             {menuOpen && (
               <div ref={menuRef} style={{ position: 'absolute', top: 'calc(100% + 8px)', right: 0, background: '#0b1220', borderRadius: 8, padding: '0.4rem', boxShadow: '0 8px 24px rgba(0,0,0,0.35)', minWidth: 160, zIndex: 60 }}>
                 <button onClick={() => { setMenuOpen(false); navigate('/profile') }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '0.6rem 0.8rem', background: 'transparent', border: 'none', color: '#e2e8f0', cursor: 'pointer' }}>Profile</button>
-                <button onClick={() => { setMenuOpen(false); navigate('/profile?tab=settings') }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '0.6rem 0.8rem', background: 'transparent', border: 'none', color: '#e2e8f0', cursor: 'pointer' }}>Settings</button>
                 <div style={{ height: 1, background: 'rgba(255,255,255,0.04)', margin: '0.3rem 0' }} />
                 <button onClick={() => { setMenuOpen(false); handleLogout() }} style={{ display: 'block', width: '100%', textAlign: 'left', padding: '0.6rem 0.8rem', background: 'transparent', border: 'none', color: '#fda4af', cursor: 'pointer' }}>Logout</button>
               </div>
