@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { Home, Activity, BookOpen, Music, LayoutDashboard } from "lucide-react";
+import { Home, Activity, BookOpen, Music, LayoutDashboard, Phone } from "lucide-react";
 
 function Sidebar() {
   return (
@@ -17,6 +17,7 @@ function Sidebar() {
         <SidebarItem to="/stories" icon={<BookOpen size={45} />} label="Stories" />
         <SidebarItem to="/music" icon={<Music size={45} />} label="Music" />
         <SidebarItem to="/dashboard" icon={<LayoutDashboard size={45} />} label="Dashboard" />
+        <SidebarItem to="/helpline" icon={<Phone size={45} />} label="Helpline" />
 
       </ul>
     </div>

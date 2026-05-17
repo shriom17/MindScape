@@ -5,6 +5,7 @@ import Tracker from './pages/Tracker'
 import Stories from './pages/Stories'
 import Music from './pages/Music'
 import Profile from './pages/Profile'
+import Helpline from './pages/helpline'
 import Navbar from './components/Navbar'
 import Sidebar from './components/Sidebar'
 import Register from './pages/register'
@@ -26,6 +27,7 @@ function AppLayout() {
             <Route path="/stories" element={<Stories />} />
             <Route path="/music" element={<Music />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/helpline" element={<Helpline />} />
             <Route path="/register" element={<Register />} />
           </Routes>
         </div>
