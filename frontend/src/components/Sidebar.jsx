@@ -12,7 +12,7 @@ function Sidebar() {
       {/* Menu */}
       <ul className="space-y-12">
 
-        <SidebarItem to="/" icon={<Home size={45} />} label="Home" />
+        <SidebarItem to="/home" icon={<Home size={45} />} label="Home" />
         <SidebarItem to="/tracker" icon={<Activity size={45} />} label="Tracker" />
         <SidebarItem to="/stories" icon={<BookOpen size={45} />} label="Stories" />
         <SidebarItem to="/music" icon={<Music size={45} />} label="Music" />

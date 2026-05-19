@@ -19,7 +19,7 @@ function AppLayout() {
   const navigate = useNavigate()
   const idleTimerRef = useRef(null)
   const idleInProgressRef = useRef(false)
-  const isRegisterPage = location.pathname === '/register'
+  const isRegisterPage = location.pathname === '/register' || location.pathname === '/'
 
   useEffect(() => {
     let mounted = true
@@ -90,7 +90,8 @@ function AppLayout() {
         {!isRegisterPage && <Sidebar />}
         <div style={{ flex: 1 }}>
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Register />} />
+            <Route path="/home" element={<Home />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/tracker" element={<Tracker />} />
             <Route path="/stories" element={<Stories />} />

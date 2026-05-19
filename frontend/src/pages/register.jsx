@@ -55,7 +55,7 @@ function Register() {
       try {
         const user = await getUser();
         if (mounted && user?.id) {
-          navigate('/');
+          navigate('/home');
         }
       } catch (e) {
         // ignore
@@ -155,7 +155,7 @@ function Register() {
         } catch (e) {
           // ignore
         }
-        navigate('/');
+        navigate('/home');
       }
     } catch (error) {
       setIsError(true);
