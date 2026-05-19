@@ -1,14 +1,19 @@
 @import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@400;600;700&display=swap");
 :root {
   --bg-primary: #1a1a2e;
   --bg-surface: #16213e;
   --bg-card: #0f3460;
   --accent-purple: #7c3aed;
   --accent-gold: #f59e0b;
+  --accent-cyan: #22d3ee;
+  --accent-amber: #fbbf24;
   --text-primary: #e2e8f0;
   --text-muted: #94a3b8;
   --shadow-dark: #0d0d1a;
   --shadow-light: #252545;
+  --font-heading: "Space Grotesk", "Segoe UI", sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", sans-serif;
 }
 
 * {
@@ -20,5 +25,5 @@
 body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
-  font-family: 'Segoe UI', sans-serif;
+  font-family: var(--font-body);
 }
