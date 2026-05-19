@@ -3,6 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { signUpWithEmail, signInWithEmail, signInWithGoogle, getUser, supabase } from "../services/supabaseClient";
 import heroImage from "../assets/loginbg.png";
 
+const LOGIN_RATE_LIMIT_WINDOW_MS = 60 * 1000;
+const LOGIN_RATE_LIMIT_MAX = 5;
+const LOGIN_RATE_LIMIT_KEY = "mindscape_login_attempts";
+
 function Register() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -13,6 +17,37 @@ function Register() {
   const [isError, setIsError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState("signup");
+
+  const readLoginAttempts = () => {
+    try {
+      const raw = localStorage.getItem(LOGIN_RATE_LIMIT_KEY);
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed)) return [];
+      return parsed.filter((ts) => typeof ts === "number" && !Number.isNaN(ts));
+    } catch (e) {
+      return [];
+    }
+  };
+
+  const writeLoginAttempts = (attempts) => {
+    try {
+      localStorage.setItem(LOGIN_RATE_LIMIT_KEY, JSON.stringify(attempts));
+    } catch (e) {
+      // ignore storage errors
+    }
+  };
+
+  const pruneLoginAttempts = (attempts, nowMs) => {
+    return attempts.filter((ts) => nowMs - ts < LOGIN_RATE_LIMIT_WINDOW_MS);
+  };
+
+  const getRetryAfterSeconds = (attempts, nowMs) => {
+    if (attempts.length < LOGIN_RATE_LIMIT_MAX) return 0;
+    const oldest = Math.min(...attempts);
+    const waitMs = LOGIN_RATE_LIMIT_WINDOW_MS - (nowMs - oldest);
+    return Math.max(1, Math.ceil(waitMs / 1000));
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -69,6 +104,19 @@ function Register() {
       return;
     }
 
+    if (mode === "login") {
+      const nowMs = Date.now();
+      const attempts = pruneLoginAttempts(readLoginAttempts(), nowMs);
+      if (attempts.length >= LOGIN_RATE_LIMIT_MAX) {
+        const retryAfterSeconds = getRetryAfterSeconds(attempts, nowMs);
+        setIsError(true);
+        setMessage(`Too many login attempts. Try again in ${retryAfterSeconds}s.`);
+        return;
+      }
+      attempts.push(nowMs);
+      writeLoginAttempts(attempts);
+    }
+
     setLoading(true);
     setMessage("");
 
@@ -93,6 +141,11 @@ function Register() {
         if (error) throw error;
         setIsError(false);
         setMessage("Login successful.");
+        try {
+          localStorage.removeItem(LOGIN_RATE_LIMIT_KEY);
+        } catch (e) {
+          // ignore storage errors
+        }
         // persist user id for legacy endpoints that require user_id
         try {
           const user = (await getUser()) || data?.user;
