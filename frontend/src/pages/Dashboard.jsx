@@ -1,43 +1,20 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { pageBgStyles } from '../styles/pageBackground'
+import { fetchJson } from '../services/api'
 
-const kpiCards = [
-  {
-    label: 'Today mood',
-    value: 'Calm',
-    detail: 'Last scan 2h ago',
-    chip: 'steady',
-    chipBg: 'rgba(34, 211, 238, 0.12)',
-    chipText: '#7dd3fc',
-  },
-  {
-    label: 'Streak',
-    value: '6 days',
-    detail: 'Best week in 2 months',
-    chip: '+2',
-    chipBg: 'rgba(251, 191, 36, 0.18)',
-    chipText: '#fbbf24',
-  },
-  {
-    label: 'Avg mood',
-    value: '7.6 / 10',
-    detail: 'Rolling 7-day average',
-    chip: 'up',
-    chipBg: 'rgba(74, 222, 128, 0.12)',
-    chipText: '#86efac',
-  },
-  {
-    label: 'Recovery',
-    value: '78%',
-    detail: 'Breathwork completion',
-    chip: 'today',
-    chipBg: 'rgba(248, 113, 113, 0.14)',
-    chipText: '#fda4af',
-  },
-]
-
-const moodTrend = [3, 4, 6, 5, 7, 8, 6, 7, 8, 7, 9, 8]
-const energyTrend = [2, 3, 4, 3, 5, 6, 4, 5, 6, 5, 6, 7]
+const EMOTION_COLORS = {
+  Calm: '#fbbf24',
+  Happy: '#34d399',
+  Neutral: '#94a3b8',
+  Sad: '#60a5fa',
+  Angry: '#f97316',
+  Fear: '#f472b6',
+  Disgust: '#a78bfa',
+  Surprise: '#22d3ee',
+  Unknown: '#64748b',
+  'No data': '#1f2937',
+}
 
 const focusItems = [
   {
@@ -57,23 +34,6 @@ const focusItems = [
   },
 ]
 
-const recentMoments = [
-  {
-    time: '9:18 AM',
-    title: 'Mood scan: Calm',
-    detail: 'Breathing steady, eyes relaxed',
-  },
-  {
-    time: '12:45 PM',
-    title: 'Tracker entry',
-    detail: 'Energy dipped after lunch',
-  },
-  {
-    time: '5:02 PM',
-    title: 'Story break',
-    detail: 'Listened to "Soft waves"',
-  },
-]
 
 const actionItems = [
   {
@@ -103,17 +63,138 @@ const actionItems = [
   },
 ]
 
-const emotionMix = [
-  { label: 'Calm', value: 44, color: '#fbbf24' },
-  { label: 'Focused', value: 26, color: '#22d3ee' },
-  { label: 'Low', value: 18, color: '#f97316' },
-  { label: 'Stressed', value: 12, color: '#f472b6' },
-]
+const toTitle = (value) => {
+  if (!value) return ''
+  const str = String(value)
+  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+}
+
+const formatShortTime = (iso) => {
+  if (!iso) return '--'
+  const dt = new Date(iso)
+  if (Number.isNaN(dt.getTime())) return '--'
+  return dt.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+}
+
+const formatRelativeTime = (iso) => {
+  if (!iso) return 'No scans yet'
+  const dt = new Date(iso)
+  if (Number.isNaN(dt.getTime())) return 'No scans yet'
+  const diffMs = Date.now() - dt.getTime()
+  const diffMinutes = Math.floor(diffMs / 60000)
+  if (diffMinutes < 1) return 'Just now'
+  if (diffMinutes < 60) return `${diffMinutes}m ago`
+  const diffHours = Math.floor(diffMinutes / 60)
+  if (diffHours < 24) return `${diffHours}h ago`
+  const diffDays = Math.floor(diffHours / 24)
+  return `${diffDays}d ago`
+}
 
 function Dashboard() {
-  const maxMood = Math.max(...moodTrend)
-  const maxEnergy = Math.max(...energyTrend)
-  const totalMix = emotionMix.reduce((sum, item) => sum + item.value, 0)
+  const [insights, setInsights] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [errorMsg, setErrorMsg] = useState('')
+
+  useEffect(() => {
+    let active = true
+    setLoading(true)
+    fetchJson('/api/moods/insights?trend=12&recent=5&days=14')
+      .then((data) => {
+        if (!active) return
+        setInsights(data)
+        setErrorMsg('')
+      })
+      .catch((err) => {
+        if (!active) return
+        setErrorMsg(err?.message || 'Failed to load dashboard insights')
+      })
+      .finally(() => {
+        if (!active) return
+        setLoading(false)
+      })
+    return () => {
+      active = false
+    }
+  }, [])
+
+  const latest = insights?.latest
+  const stats = insights?.stats || {}
+  const trendPoints = insights?.trend || []
+  const moodTrend = trendPoints.map((point) => point?.mood_score ?? 0)
+  const confidenceTrend = trendPoints.map((point) => point?.confidence_score ?? 0)
+
+  const maxMood = moodTrend.length ? Math.max(...moodTrend) : 10
+  const maxConfidence = confidenceTrend.length ? Math.max(...confidenceTrend) : 10
+
+  const avgMoodScore = Number.isFinite(stats.avg_mood_score_7d) ? stats.avg_mood_score_7d.toFixed(1) : 'N/A'
+  const avgConfidenceScore = Number.isFinite(stats.avg_confidence_score_7d) ? stats.avg_confidence_score_7d.toFixed(1) : 'N/A'
+  const avgMoodValue = avgMoodScore === 'N/A' ? 'N/A' : `${avgMoodScore} / 10`
+  const streakDays = Number.isFinite(stats.streak_days) ? stats.streak_days : 0
+  const consistency = Number.isFinite(stats.consistency_14d) ? stats.consistency_14d : 0
+  const windowDays = Number.isFinite(stats.window_days) ? stats.window_days : 14
+
+  const latestEmotion = latest?.emotion ? toTitle(latest.emotion) : 'No data'
+  const lastScanLabel = latest?.timestamp ? formatRelativeTime(latest.timestamp) : 'No scans yet'
+
+  const latestConfidence = Number(latest?.confidence)
+  const latestConfidenceLabel = Number.isFinite(latestConfidence) ? `${latestConfidence.toFixed(1)}%` : 'N/A'
+  const trendCount = trendPoints.length
+
+  const kpiCards = [
+    {
+      label: 'Latest mood',
+      value: latestEmotion,
+      detail: lastScanLabel,
+      chip: 'live',
+      chipBg: 'rgba(34, 211, 238, 0.12)',
+      chipText: '#7dd3fc',
+    },
+    {
+      label: 'Streak',
+      value: `${streakDays} day${streakDays === 1 ? '' : 's'}`,
+      detail: 'Consecutive scan days',
+      chip: 'days',
+      chipBg: 'rgba(251, 191, 36, 0.18)',
+      chipText: '#fbbf24',
+    },
+    {
+      label: 'Avg mood',
+      value: avgMoodValue,
+      detail: 'Average last 7 days',
+      chip: '7d',
+      chipBg: 'rgba(74, 222, 128, 0.12)',
+      chipText: '#86efac',
+    },
+    {
+      label: 'Consistency',
+      value: `${consistency}%`,
+      detail: `Days with scans (${windowDays}d)`,
+      chip: `${windowDays}d`,
+      chipBg: 'rgba(248, 113, 113, 0.14)',
+      chipText: '#fda4af',
+    },
+  ]
+
+  const recentMoments = (insights?.recent || []).map((item) => {
+    const confidence = Number(item?.confidence)
+    const confidenceLabel = Number.isFinite(confidence) ? `Confidence ${confidence.toFixed(1)}%` : 'Mood captured'
+    return {
+      time: formatShortTime(item?.timestamp),
+      title: item?.emotion ? `Mood scan: ${toTitle(item.emotion)}` : 'Mood scan',
+      detail: confidenceLabel,
+    }
+  })
+
+  const mixSource = insights?.mix || []
+  const emotionMix = mixSource.length
+    ? mixSource.map((item) => ({
+        label: item.label,
+        value: Number.isFinite(item.percent) ? item.percent : 0,
+        color: EMOTION_COLORS[item.label] || EMOTION_COLORS.Unknown,
+      }))
+    : [{ label: 'No data', value: 100, color: EMOTION_COLORS['No data'] }]
+
+  const totalMix = emotionMix.reduce((sum, item) => sum + item.value, 0) || 1
   let mixCursor = 0
   const mixStops = emotionMix.map((item) => {
     const start = mixCursor
@@ -446,6 +527,11 @@ function Dashboard() {
               <div className="ms-kicker">Daily overview</div>
               <h1 className="ms-title">Your MindScape Dashboard</h1>
               <p className="ms-subtitle">Snapshot of your mood, focus, and recovery rhythms. Keep the calm going.</p>
+              {errorMsg ? (
+                <p style={{ marginTop: '0.6rem', color: '#fca5a5' }}>{errorMsg}</p>
+              ) : loading ? (
+                <p style={{ marginTop: '0.6rem', color: '#94a3b8' }}>Loading live data...</p>
+              ) : null}
             </div>
             <div className="ms-date">
               <div className="ms-date-pill">{todayLabel}</div>
@@ -474,41 +560,49 @@ function Dashboard() {
                     <div className="ms-label">Mood trend</div>
                     <div className="ms-value" style={{ fontSize: '1.2rem' }}>Week flow</div>
                   </div>
-                  <div className="ms-pill">last 12 check-ins</div>
+                  <div className="ms-pill">{trendCount ? `last ${trendCount} check-ins` : 'no scans yet'}</div>
                 </div>
-                <div className="ms-spark">
-                  {moodTrend.map((value, index) => (
-                    <span
-                      key={`mood-${index}`}
-                      style={{ height: `${(value / maxMood) * 100}%`, animationDelay: `${0.15 + index * 0.05}s` }}
-                    />
-                  ))}
-                </div>
+                {moodTrend.length ? (
+                  <div className="ms-spark">
+                    {moodTrend.map((value, index) => (
+                      <span
+                        key={`mood-${index}`}
+                        style={{ height: `${(value / maxMood) * 100}%`, animationDelay: `${0.15 + index * 0.05}s` }}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="ms-meta" style={{ marginTop: '1rem' }}>No scans yet. Start a scan to build your trend.</div>
+                )}
                 <div className="ms-chart-meta">
-                  <span>Avg 7.6</span>
-                  <span>Peak 9.0</span>
+                  <span>Avg {avgMoodScore}</span>
+                  <span>{latestEmotion !== 'No data' ? `Latest ${latestEmotion}` : 'No recent mood'}</span>
                 </div>
               </div>
 
               <div className="ms-card" style={{ marginTop: 20, animationDelay: '0.25s' }}>
                 <div className="ms-chart-top">
                   <div>
-                    <div className="ms-label">Energy</div>
-                    <div className="ms-value" style={{ fontSize: '1.2rem' }}>Daily stamina</div>
+                    <div className="ms-label">Confidence</div>
+                    <div className="ms-value" style={{ fontSize: '1.2rem' }}>Detection certainty</div>
                   </div>
-                  <div className="ms-pill">last 12 entries</div>
+                  <div className="ms-pill">{trendCount ? `last ${trendCount} entries` : 'no scans yet'}</div>
                 </div>
-                <div className="ms-spark energy">
-                  {energyTrend.map((value, index) => (
-                    <span
-                      key={`energy-${index}`}
-                      style={{ height: `${(value / maxEnergy) * 100}%`, animationDelay: `${0.12 + index * 0.04}s` }}
-                    />
-                  ))}
-                </div>
+                {confidenceTrend.length ? (
+                  <div className="ms-spark energy">
+                    {confidenceTrend.map((value, index) => (
+                      <span
+                        key={`confidence-${index}`}
+                        style={{ height: `${(value / maxConfidence) * 100}%`, animationDelay: `${0.12 + index * 0.04}s` }}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="ms-meta" style={{ marginTop: '1rem' }}>No confidence data yet.</div>
+                )}
                 <div className="ms-chart-meta">
-                  <span>Recovery trend: +12%</span>
-                  <span>Evening dip: 4 PM</span>
+                  <span>Avg {avgConfidenceScore} / 10</span>
+                  <span>Latest {latestConfidenceLabel}</span>
                 </div>
               </div>
 
@@ -521,15 +615,19 @@ function Dashboard() {
                   <div className="ms-pill">today</div>
                 </div>
                 <div className="ms-timeline">
-                  {recentMoments.map((item) => (
-                    <div className="ms-timeline-item" key={item.time}>
-                      <div className="ms-time">{item.time}</div>
-                      <div className="ms-timeline-card">
-                        <div style={{ fontWeight: 600 }}>{item.title}</div>
-                        <div className="ms-meta">{item.detail}</div>
+                  {recentMoments.length ? (
+                    recentMoments.map((item) => (
+                      <div className="ms-timeline-item" key={`${item.time}-${item.title}`}>
+                        <div className="ms-time">{item.time}</div>
+                        <div className="ms-timeline-card">
+                          <div style={{ fontWeight: 600 }}>{item.title}</div>
+                          <div className="ms-meta">{item.detail}</div>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))
+                  ) : (
+                    <div className="ms-meta" style={{ marginTop: '0.8rem' }}>No recent scans yet.</div>
+                  )}
                 </div>
               </div>
             </div>
@@ -568,7 +666,7 @@ function Dashboard() {
               <div className="ms-card ms-mix" style={{ marginTop: 20, animationDelay: '0.3s' }}>
                 <div>
                   <div className="ms-label">Emotion mix</div>
-                  <div className="ms-value" style={{ fontSize: '1.2rem' }}>Last 14 days</div>
+                  <div className="ms-value" style={{ fontSize: '1.2rem' }}>Last {windowDays} days</div>
                 </div>
                 <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap' }}>
                   <div className="ms-ring" style={{ '--ms-ring-bg': mixGradient }}>
