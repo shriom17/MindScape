@@ -176,12 +176,12 @@ function Tracker() {
       <div style={{ ...pageBgStyles.orbBase, ...pageBgStyles.orbRight }} />
 
       <div className="min-h-screen w-full px-6 py-10" style={{ position: "relative", zIndex: 1 }}>
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-8">
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-8">
           <h1 className="text-3xl font-bold text-amber-400">
             Daily tracker
           </h1>
 
-          <div className="grid w-full items-start gap-10 lg:grid-cols-[minmax(0,360px)_minmax(0,1fr)] lg:gap-12">
+          <div className="grid w-full items-start gap-12 lg:grid-cols-[minmax(0,380px)_minmax(0,1.25fr)] lg:gap-14">
             <div
               style={{
                 width: "100%",
@@ -305,59 +305,61 @@ function Tracker() {
               )}
             </div>
 
-            <div className="w-full rounded-2xl border border-white/10 bg-[#0b1220]/60 p-6">
-              <div className="flex flex-wrap items-end justify-between gap-4">
+            <div className="w-full rounded-2xl border border-white/10 bg-[#0b1220] p-10">
+              <div className="flex flex-wrap items-end justify-between gap-4 rounded-xl bg-[#0f1f3d] px-6 py-4">
                 <div>
-                  <p className="inline-flex items-center rounded-md bg-[#0b1a36] px-9 py-2 text-xl font-semibold text-white">
-                    Daily check-in
-                  </p>
+                  <p className="text-xl font-semibold text-white">Daily check-in</p>
+                  <p className="mt-1 text-sm text-slate-200">Low = 1 · High = 5</p>
                 </div>
-                <div className="text-sm text-slate-300">
+                <div className="text-sm text-slate-200">
                   {answeredCount}/{totalQuestions} answered
                 </div>
               </div>
 
-              <div className="mt-8 space-y-6">
-                {assessmentSections.map((section) => (
-                  <div key={section.title} className="space-y-0">
-                    <div className="divide-y divide-white/10 rounded-xl border border-white/10">
-                      {section.questions.map((question) => (
-                        <div
-                          key={question.id}
-                          className="flex flex-wrap items-center justify-between gap-4 px-4 py-4"
-                        >
-                          <p className="text-base text-slate-100">{question.label}</p>
-                          <div className="grid grid-cols-5 gap-2">
-                            {assessmentScale.map((value) => (
-                              <label
-                                key={`${question.id}-${value}`}
-                                className={`grid h-9 w-9 cursor-pointer place-items-center rounded-md border text-sm font-semibold transition ${
-                                  assessmentAnswers[question.id] === value
-                                    ? "border-white bg-white text-slate-900"
-                                    : "border-white/15 text-slate-200 hover:border-white/40 hover:bg-white/10"
-                                }`}
-                              >
-                                <input
-                                  type="radio"
-                                  name={`assessment-${question.id}`}
-                                  value={value}
-                                  checked={assessmentAnswers[question.id] === value}
-                                  onChange={(event) =>
-                                    handleAssessmentChange(question.id, Number(event.target.value))
-                                  }
-                                  className="sr-only"
-                                />
-                                {value}
-                              </label>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
+<div className="mx-auto mt-10 w-full max-w-4xl px-4 sm:px-6 lg:px-8">
+  <div className="flex flex-col gap-6">
+    {assessmentQuestions.map((question) => (
+      <div
+        key={question.id}
+        className="rounded-2xl border border-white/10 bg-[#0f1a33]/50 px-8 py-6"
+      >
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:gap-8">
+          <p className="flex-1 text-base leading-relaxed text-slate-50">
+            {question.label}
+          </p>
 
+          <div className="grid grid-cols-5 gap-3">
+            {assessmentScale.map((value) => (
+              <label
+                key={`${question.id}-${value}`}
+                className={`grid h-10 w-10 cursor-pointer place-items-center rounded-md border text-sm font-semibold transition ${
+                  assessmentAnswers[question.id] === value
+                    ? "border-white bg-white text-slate-900"
+                    : "border-white/15 text-slate-200 hover:border-white/40 hover:bg-white/10"
+                }`}
+              >
+                <input
+                  type="radio"
+                  name={`assessment-${question.id}`}
+                  value={value}
+                  checked={assessmentAnswers[question.id] === value}
+                  onChange={(event) =>
+                    handleAssessmentChange(
+                      question.id,
+                      Number(event.target.value)
+                    )
+                  }
+                  className="sr-only"
+                />
+                {value}
+              </label>
+            ))}
+          </div>
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
               <div className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-white/10 bg-white/5 px-4 py-3">
                 <div>
                   <p className="text-sm text-slate-300">Mood score</p>
