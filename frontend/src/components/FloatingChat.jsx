@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { fetchJson } from '../services/api'
 
-function FloatingChat({ mood }) {
-  const [isOpen, setIsOpen] = useState(false)
+function FloatingChat({ mood, isOpen, onOpenChange }) {
+  const [internalOpen, setInternalOpen] = useState(false)
+  const open = typeof isOpen === 'boolean' ? isOpen : internalOpen
+  const setOpen = onOpenChange ?? setInternalOpen
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -28,7 +30,7 @@ function FloatingChat({ mood }) {
     <>
       {/* Floating Button */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => setOpen(!open)}
         style={{
           position: 'fixed',
           bottom: '2rem',
@@ -47,7 +49,7 @@ function FloatingChat({ mood }) {
       </button>
 
       {/* Chat Window */}
-      {isOpen && (
+      {open && (
         <div style={{
           position: 'fixed',
           bottom: '6rem',

@@ -45,112 +45,111 @@ function Home() {
       <div style={{ ...pageBgStyles.orbBase, ...pageBgStyles.orbRight }} />
 
       <div className="min-h-screen flex flex-col items-center justify-center gap-8 p-8" style={{ position: 'relative', zIndex: 1 }}>
+        <h1 className="text-3xl font-bold text-amber-400">
+          How are you feeling today, Arjuna?
+        </h1>
 
-      <h1 className="text-3xl font-bold text-amber-400">
-        How are you feeling today, Arjuna?
-      </h1>
+        {/* Camera - only show when cameraOn */}
+        {cameraOn && (
+          <Camera onMoodDetected={setMood} onError={setProcessingError} active={cameraOn} />
+        )}
 
-      {/* Camera — shudhu cameraOn hole show korbe */}
-      {cameraOn && (
-        <Camera onMoodDetected={setMood} onError={setProcessingError} active={cameraOn} />
-      )}
-
-      {/* Start Button */}
-      {!cameraOn && !scanComplete && (
-        <button onClick={startScan} style={{
-          background: 'linear-gradient(135deg, #040d27, #5a83c1)',
-          color: '#f59e0b',
-          border: 'none',
-          padding: '1rem 2.5rem',
-          borderRadius: '12px',
-          fontSize: '1.1rem',
-          cursor: 'pointer',
-          boxShadow: '0 4px 15px rgba(199, 181, 67, 0.49)'
-        }}>
-          Start Scan
-        </button>
-      )}
-
-      {/* Countdown */}
-      {scanning && (
-        <div className="flex flex-col items-center gap-3">
-          <p className="text-slate-300 text-lg">Scanning your expression...</p>
-          <div style={{
-            width: '200px', height: '8px',
-            background: '#0f3460', borderRadius: '4px', overflow: 'hidden'
+        {/* Start Button */}
+        {!cameraOn && !scanComplete && (
+          <button onClick={startScan} style={{
+            background: 'linear-gradient(135deg, #040d27, #5a83c1)',
+            color: '#f59e0b',
+            border: 'none',
+            padding: '1rem 2.5rem',
+            borderRadius: '12px',
+            fontSize: '1.1rem',
+            cursor: 'pointer',
+            boxShadow: '0 4px 15px rgba(199, 181, 67, 0.49)'
           }}>
-            <div style={{
-              width: `${((5 - countdown) / 5) * 100}%`,
-              height: '100%',
-              background: 'linear-gradient(90deg, #7c3aed, #f59e0b)',
-              borderRadius: '4px',
-              transition: 'width 1s ease'
-            }}/>
-          </div>
-          <p className="text-amber-400 text-2xl font-bold">{countdown}</p>
-        </div>
-      )}
+            Start Scan
+          </button>
+        )}
 
-      {/* Result */}
-      {scanComplete && (
-        <>
-          {mood?.emotion ? (
-            <>
-              <MoodDisplay mood={mood} />
-              <button onClick={startScan} style={{
-                background: '#0f3460',
-                color: '#94a3b8',
-                border: 'none',
-                padding: '0.5rem 1.5rem',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontSize: '0.9rem'
-              }}>
-                Scan Again
-              </button>
-            </>
-          ) : (
+        {/* Countdown */}
+        {scanning && (
+          <div className="flex flex-col items-center gap-3">
+            <p className="text-slate-300 text-lg">Scanning your expression...</p>
             <div style={{
-              background: '#16213e',
-              borderRadius: '16px',
-              padding: '2rem',
-              textAlign: 'center',
-              minWidth: '280px',
-              color: '#fecaca'
+              width: '200px', height: '8px',
+              background: '#0f3460', borderRadius: '4px', overflow: 'hidden'
             }}>
-              {processingError ? (
-                <>
-                  <p style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '1rem' }}>
-                    ⚠️ Detection Failed
-                  </p>
-                  <p style={{ fontSize: '0.9rem', marginBottom: '1rem' }}>
-                    {processingError}
-                  </p>
-                </>
-              ) : (
-                <>
-                  <p style={{ fontSize: '1rem' }}>Processing...</p>
-                  <div style={{ marginTop: '1rem', fontSize: '2rem' }}>⏳</div>
-                </>
-              )}
-              <button onClick={startScan} style={{
-                marginTop: '1rem',
-                background: '#0f3460',
-                color: '#94a3b8',
-                border: 'none',
-                padding: '0.5rem 1.5rem',
-                borderRadius: '8px',
-                cursor: 'pointer',
-                fontSize: '0.9rem'
-              }}>
-                Try Again
-              </button>
+              <div style={{
+                width: `${((5 - countdown) / 5) * 100}%`,
+                height: '100%',
+                background: 'linear-gradient(90deg, #7c3aed, #f59e0b)',
+                borderRadius: '4px',
+                transition: 'width 1s ease'
+              }}/>
             </div>
-          )}
-        </>
-      )}
+            <p className="text-amber-400 text-2xl font-bold">{countdown}</p>
+          </div>
+        )}
 
-      <FloatingChat mood={mood} />
+        {/* Result */}
+        {scanComplete && (
+          <>
+            {mood?.emotion ? (
+              <>
+                <MoodDisplay mood={mood} />
+                <button onClick={startScan} style={{
+                  background: '#0f3460',
+                  color: '#94a3b8',
+                  border: 'none',
+                  padding: '0.5rem 1.5rem',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem'
+                }}>
+                  Scan Again
+                </button>
+              </>
+            ) : (
+              <div style={{
+                background: '#16213e',
+                borderRadius: '16px',
+                padding: '2rem',
+                textAlign: 'center',
+                minWidth: '280px',
+                color: '#fecaca'
+              }}>
+                {processingError ? (
+                  <>
+                    <p style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '1rem' }}>
+                      ⚠️ Detection Failed
+                    </p>
+                    <p style={{ fontSize: '0.9rem', marginBottom: '1rem' }}>
+                      {processingError}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p style={{ fontSize: '1rem' }}>Processing...</p>
+                    <div style={{ marginTop: '1rem', fontSize: '2rem' }}>⏳</div>
+                  </>
+                )}
+                <button onClick={startScan} style={{
+                  marginTop: '1rem',
+                  background: '#0f3460',
+                  color: '#94a3b8',
+                  border: 'none',
+                  padding: '0.5rem 1.5rem',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem'
+                }}>
+                  Try Again
+                </button>
+              </div>
+            )}
+          </>
+        )}
+
+        <FloatingChat mood={mood} />
       </div>
     </div>
   )
