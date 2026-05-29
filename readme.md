@@ -1,38 +1,128 @@
-MindScape
-=========
+# 🧠 MindScape — Your Everyday Mental Wellness Companion
 
-MindScape is a mental wellness web app that blends mood tracking, calming stories, and a gentle AI companion inspired by the Bhagavad Gita. It is built for everyday users who want quick, private check-ins and small supportive actions.
+MindScape is an AI-powered mental wellness web app designed to help users understand their emotions, reduce stress, and build healthier habits through simple daily check-ins.
 
-How MindScape helps people
---------------------------
-- Daily mood check-ins help users understand how they are feeling.
-- Calming stories and music help reduce stress.
-- Keshava chat offers gentle guidance and small positive steps.
-- The helpline page points users toward professional support.
-- Trends, streaks, and consistency help build healthy habits.
+It combines **mood tracking**, **calming stories**, **music therapy**, and a gentle AI companion named **Keshava**, inspired by the wisdom of the Bhagavad Gita.
 
-Pages and Functions
--------------------
-- / and /register: Sign up/login (email/password or Google), basic onboarding.
-- /home: Camera-based mood scan, countdown, mood result, Keshava chat.
-- /dashboard: Mood insights, streak/average/consistency, recent scans, trend view, quick actions.
-- /tracker: Daily mood selection + note saving, short self-assessment, mood score, low-score prompt to chat.
-- /stories: Mood-based stories, trending, save/read/like, demo stories seed.
-- /music: Curated tracks + Jamendo, play/pause/stop, mini player.
-- /profile: Avatar upload, name/birthdate update, daily mood badge.
-- /helpline: Psychologists/counselors list with guidance notes.
+Built with privacy and accessibility in mind, MindScape supports users with small daily actions that feel calming, supportive, and easy to maintain.
 
-Core Features
--------------
-- Mood scan with optional computer vision.
-- Daily tracker with quick self-assessment.
-- AI companion chat (Keshava).
-- Story and music libraries for calming breaks.
-- Helpline directory for real-world support.
+---
 
-Quick Start (Local)
--------------------
-1) Install dependencies
+## ✨ Why MindScape?
+
+Mental wellness support should feel simple and approachable.
+
+MindScape helps users:
+
+🧠 Track emotions through daily check-ins and mood scans
+📖 Read calming stories based on their mood
+🎵 Listen to relaxing music for stress relief
+💬 Talk with **Keshava**, an AI companion for gentle guidance
+📊 Build healthy habits with streaks and progress insights
+🆘 Access helplines and real-world professional support when needed
+
+---
+
+## 🚀 Features
+
+### 😊 Mood Tracking
+
+* Daily mood selection
+* Quick self-assessment
+* Notes & reflections
+* Mood score generation
+* Weekly mood trends
+
+### 📷 AI Mood Scan
+
+* Camera-based emotion detection
+* Optional computer vision analysis
+* Countdown + instant mood results
+
+### 💬 Keshava AI Companion
+
+* Gentle supportive conversations
+* Personalized emotional guidance
+* Positive suggestions inspired by Bhagavad Gita values
+
+### 📖 Story Library
+
+* Mood-based calming stories
+* Trending & recommended stories
+* Save, like, and continue reading
+
+### 🎵 Music Therapy
+
+* Curated relaxing tracks
+* Jamendo music integration
+* Mini player controls
+
+### 📊 Dashboard & Insights
+
+* Mood averages
+* Daily streak tracking
+* Consistency score
+* Recent scan history
+* Trend visualization
+
+### 👤 Profile
+
+* Avatar upload
+* Personal details
+* Daily mood badge
+
+### 🆘 Helpline Directory
+
+* Psychologists & counselors
+* Support guidance notes
+* Easy access during difficult moments
+
+---
+
+## 🗺 Pages Overview
+
+| Route        | Purpose                   |
+| ------------ | ------------------------- |
+| `/`          | Login                     |
+| `/register`  | Registration + onboarding |
+| `/home`      | Mood scan + Keshava chat  |
+| `/dashboard` | Insights & trends         |
+| `/tracker`   | Daily mood check-in       |
+| `/stories`   | Story library             |
+| `/music`     | Music therapy             |
+| `/profile`   | User profile              |
+| `/helpline`  | Mental health support     |
+
+---
+
+## 🛠 Tech Stack
+
+### Frontend
+
+* React 19
+* Vite
+* React Router
+* Tailwind CSS
+
+### Backend
+
+* Flask
+* SQLAlchemy
+* SQLite
+
+### Optional AI / ML
+
+* Groq
+* LangChain
+* FAISS
+* DeepFace
+* Hugging Face Inference
+
+---
+
+## ⚡ Quick Start
+
+### 1. Install dependencies
 
 ```bash
 cd frontend
@@ -42,33 +132,58 @@ cd ../backend
 pip install -r requirements.txt
 ```
 
-2) Run the backend
+### 2. Run backend
 
 ```bash
 cd backend
 python app.py
 ```
 
-3) Run the frontend
+### 3. Run frontend
 
 ```bash
 cd frontend
 npm run dev
 ```
 
-Optional: Enable Full ML Features
----------------------------------
+---
+
+## 🤖 Optional ML Features
+
+Install full ML support:
+
 ```bash
 cd backend
 pip install -r requirements-ml.txt
 ```
 
-Tech Stack
-----------
-- Frontend: React 19, Vite, React Router, Tailwind CSS
-- Backend: Flask, SQLAlchemy, SQLite (default)
-- Optional ML/LLM: Groq, LangChain, FAISS, DeepFace, Hugging Face inference
+---
 
-License
--------
+## 🌱 Future Enhancements
+
+* Emergency support alerts
+* Personalized meditation suggestions
+* Better AI mood analysis
+* Weekly emotional wellness reports
+* Voice-based Keshava conversations
+
+---
+
+## 🔐 Privacy First
+
+MindScape is built to feel safe and supportive.
+
+* Private daily mood tracking
+* User-controlled data
+* Optional AI analysis
+* Encourages professional help when needed
+
+---
+
+## 📄 License
+
 Add your preferred license here.
+
+---
+
+Made with ❤️ to support everyday mental wellness.
