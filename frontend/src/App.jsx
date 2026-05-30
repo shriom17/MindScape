@@ -10,6 +10,7 @@ import Helpline from './pages/helpline'
 import Navbar from './components/Navbar'
 import Sidebar from './components/Sidebar'
 import Register from './pages/register'
+import Onboarding from './pages/Onboarding'
 import { supabase } from './services/supabaseClient'
 
 const IDLE_TIMEOUT_MS = 15 * 60 * 1000
@@ -19,7 +20,7 @@ function AppLayout() {
   const navigate = useNavigate()
   const idleTimerRef = useRef(null)
   const idleInProgressRef = useRef(false)
-  const isRegisterPage = location.pathname === '/register' || location.pathname === '/'
+  const isRegisterPage = location.pathname === '/register' || location.pathname === '/' || location.pathname === '/onboarding'
 
   useEffect(() => {
     let mounted = true
@@ -99,6 +100,7 @@ function AppLayout() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/helpline" element={<Helpline />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/onboarding" element={<Onboarding />} />
           </Routes>
         </div>
       </div>

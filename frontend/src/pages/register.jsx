@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { signUpWithEmail, signInWithEmail, signInWithGoogle, getUser, supabase } from "../services/supabaseClient";
+import { fetchJson } from "../services/api";
 import heroImage from "../assets/loginbg.png";
 
 const LOGIN_RATE_LIMIT_WINDOW_MS = 60 * 1000;
@@ -17,6 +18,19 @@ function Register() {
   const [isError, setIsError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState("signup");
+
+  const routeAfterLogin = useCallback(async () => {
+    try {
+      const data = await fetchJson('/api/onboarding');
+      if (data?.onboarding?.completed) {
+        navigate('/dashboard');
+      } else {
+        navigate('/onboarding');
+      }
+    } catch (e) {
+      navigate('/dashboard');
+    }
+  }, [navigate]);
 
   const readLoginAttempts = () => {
     try {
@@ -55,7 +69,7 @@ function Register() {
       try {
         const user = await getUser();
         if (mounted && user?.id) {
-          navigate('/home');
+          await routeAfterLogin();
         }
       } catch (e) {
         // ignore
@@ -64,7 +78,7 @@ function Register() {
     return () => {
       mounted = false;
     };
-  }, [navigate]);
+  }, [navigate, routeAfterLogin]);
 
   const calculateAge = (dobStr) => {
     const dob = new Date(dobStr);
@@ -132,10 +146,19 @@ function Register() {
         } catch (e) {
           // ignore if update fails (e.g., email confirmation required)
         }
+        try {
+          const createdUser = data?.user;
+          if (createdUser?.id) {
+            localStorage.setItem('mindscape_user_id', createdUser.id);
+          }
+        } catch (e) {
+          // ignore storage errors
+        }
         setName("");
         setBirthdate("");
         setEmail("");
         setPassword("");
+        navigate('/onboarding');
       } else {
         const { data, error } = await signInWithEmail(email.trim(), password);
         if (error) throw error;
@@ -155,7 +178,7 @@ function Register() {
         } catch (e) {
           // ignore
         }
-        navigate('/home');
+        await routeAfterLogin();
       }
     } catch (error) {
       setIsError(true);

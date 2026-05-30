@@ -1,0 +1,490 @@
+.ms-onboarding {
+  --ob-ink: #f8fafc;
+  --ob-muted: rgba(226, 232, 240, 0.72);
+  --ob-surface: rgba(7, 16, 28, 0.82);
+  --ob-border: rgba(255, 255, 255, 0.12);
+  --ob-accent: #fbbf24;
+  --ob-accent-soft: rgba(251, 191, 36, 0.22);
+  --ob-accent-2: #22d3ee;
+  --ob-accent-3: #34d399;
+  --ob-shadow: rgba(2, 8, 18, 0.55);
+  min-height: calc(100vh - 72px);
+  display: grid;
+  place-items: center;
+  padding: 2.5rem 1.5rem 3.5rem;
+  background: radial-gradient(circle at 12% 20%, rgba(251, 191, 36, 0.12), transparent 45%),
+    radial-gradient(circle at 88% 12%, rgba(34, 211, 238, 0.16), transparent 35%),
+    linear-gradient(140deg, #071729 0%, #0d2234 45%, #112b33 100%),
+    repeating-linear-gradient(90deg, rgba(148, 163, 184, 0.06) 0 1px, transparent 1px 40px);
+  position: relative;
+  overflow: hidden;
+  color: var(--ob-ink);
+  font-family: var(--font-body);
+}
+
+.ms-onboarding-orb {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(2px);
+  opacity: 0.6;
+  animation: float 8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.ms-orb-1 {
+  width: 240px;
+  height: 240px;
+  left: -60px;
+  top: 20%;
+  background: rgba(251, 191, 36, 0.28);
+  animation-delay: 0s;
+}
+
+.ms-orb-2 {
+  width: 320px;
+  height: 320px;
+  right: -120px;
+  top: 12%;
+  background: rgba(34, 211, 238, 0.22);
+  animation-delay: 1.4s;
+}
+
+.ms-orb-3 {
+  width: 220px;
+  height: 220px;
+  right: 15%;
+  bottom: -80px;
+  background: rgba(52, 211, 153, 0.2);
+  animation-delay: 2.2s;
+}
+
+.ms-onboarding-shell {
+  width: min(1150px, 100%);
+  display: grid;
+  grid-template-columns: minmax(260px, 0.9fr) minmax(320px, 1.1fr);
+  gap: 24px;
+  background: var(--ob-surface);
+  border-radius: 24px;
+  border: 1px solid var(--ob-border);
+  box-shadow: 0 24px 60px var(--ob-shadow);
+  backdrop-filter: blur(10px);
+  padding: 2.2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.ms-onboarding-side {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+  border-right: 1px solid rgba(148, 163, 184, 0.12);
+  padding-right: 1.6rem;
+}
+
+.ms-brand {
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ob-accent-2);
+}
+
+.ms-onboarding-side h1 {
+  font-family: var(--font-heading);
+  font-size: clamp(1.8rem, 2.5vw, 2.4rem);
+  margin: 0;
+}
+
+.ms-onboarding-side p {
+  color: var(--ob-muted);
+  line-height: 1.7;
+}
+
+.ms-stepper {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.ms-step {
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  gap: 12px;
+  align-items: center;
+  padding: 0.65rem 0.75rem;
+  border-radius: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  background: rgba(8, 20, 34, 0.6);
+  transition: border 0.2s ease, transform 0.2s ease;
+}
+
+.ms-step.active {
+  border-color: rgba(34, 211, 238, 0.5);
+  box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.15);
+  transform: translateX(2px);
+}
+
+.ms-step.done {
+  border-color: rgba(52, 211, 153, 0.4);
+}
+
+.ms-step-index {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  background: rgba(148, 163, 184, 0.12);
+  color: var(--ob-ink);
+}
+
+.ms-step.active .ms-step-index {
+  background: rgba(34, 211, 238, 0.18);
+  color: #7dd3fc;
+}
+
+.ms-step.done .ms-step-index {
+  background: rgba(52, 211, 153, 0.18);
+  color: #6ee7b7;
+}
+
+.ms-step-title {
+  font-weight: 600;
+}
+
+.ms-step-subtitle {
+  color: var(--ob-muted);
+  font-size: 0.85rem;
+}
+
+.ms-onboarding-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+.ms-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.ms-progress {
+  display: grid;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--ob-muted);
+}
+
+.ms-progress-bar {
+  width: 220px;
+  height: 6px;
+  background: rgba(148, 163, 184, 0.15);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.ms-progress-bar span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--ob-accent), var(--ob-accent-2));
+  transition: width 0.3s ease;
+}
+
+.ms-ghost-btn {
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: transparent;
+  color: var(--ob-muted);
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.ms-ghost-btn:hover {
+  border-color: rgba(34, 211, 238, 0.5);
+  color: #7dd3fc;
+}
+
+.ms-step-card {
+  background: rgba(10, 22, 38, 0.76);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 20px 40px rgba(2, 8, 18, 0.35);
+  animation: fadeUp 0.5s ease both;
+}
+
+.ms-auth-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.9rem 1rem;
+  border-radius: 14px;
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  background: rgba(251, 191, 36, 0.12);
+  color: var(--ob-ink);
+  margin-bottom: 1.4rem;
+  font-size: 0.95rem;
+}
+
+.ms-link-btn {
+  border: none;
+  background: transparent;
+  color: #fde68a;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ms-step-card h2 {
+  margin: 0 0 0.4rem 0;
+  font-family: var(--font-heading);
+}
+
+.ms-step-hint {
+  color: var(--ob-muted);
+  margin-bottom: 1.6rem;
+}
+
+.ms-field {
+  display: grid;
+  gap: 0.6rem;
+  margin-bottom: 1.4rem;
+}
+
+.ms-field label {
+  color: var(--ob-muted);
+  font-size: 0.9rem;
+}
+
+.ms-field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.ms-input {
+  width: 100%;
+  padding: 0.7rem 0.85rem;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(5, 12, 24, 0.8);
+  color: var(--ob-ink);
+  font-size: 0.95rem;
+}
+
+.ms-input:focus {
+  outline: none;
+  border-color: rgba(34, 211, 238, 0.6);
+  box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.12);
+}
+
+.ms-option-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.75rem;
+}
+
+.ms-option {
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 14px;
+  padding: 0.75rem 0.9rem;
+  background: rgba(7, 16, 28, 0.7);
+  color: var(--ob-ink);
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.2s ease, border 0.2s ease, background 0.2s ease;
+}
+
+.ms-option.selected {
+  border-color: rgba(251, 191, 36, 0.7);
+  background: rgba(251, 191, 36, 0.12);
+  box-shadow: 0 0 0 1px rgba(251, 191, 36, 0.25);
+}
+
+.ms-option:hover {
+  transform: translateY(-1px);
+  border-color: rgba(34, 211, 238, 0.4);
+}
+
+.ms-toggle {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 14px;
+  padding: 0.9rem 1rem;
+  background: rgba(7, 16, 28, 0.65);
+  margin-top: 0.5rem;
+}
+
+.ms-toggle input {
+  position: absolute;
+  opacity: 0;
+}
+
+.ms-toggle-track {
+  width: 44px;
+  height: 24px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.3);
+  position: relative;
+  transition: background 0.2s ease;
+}
+
+.ms-toggle-track::after {
+  content: "";
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #f8fafc;
+  position: absolute;
+  top: 3px;
+  left: 4px;
+  transition: transform 0.2s ease;
+}
+
+.ms-toggle input:checked + .ms-toggle-track {
+  background: rgba(52, 211, 153, 0.6);
+}
+
+.ms-toggle input:checked + .ms-toggle-track::after {
+  transform: translateX(18px);
+}
+
+.ms-toggle-text {
+  color: var(--ob-muted);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.ms-action-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.4rem;
+}
+
+.ms-primary-btn,
+.ms-secondary-btn {
+  border: none;
+  border-radius: 999px;
+  padding: 0.7rem 1.5rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.ms-primary-btn {
+  background: linear-gradient(120deg, var(--ob-accent), var(--ob-accent-2));
+  color: #0b1220;
+  box-shadow: 0 12px 24px rgba(34, 211, 238, 0.15);
+}
+
+.ms-secondary-btn {
+  background: rgba(148, 163, 184, 0.2);
+  color: var(--ob-ink);
+}
+
+.ms-primary-btn:hover,
+.ms-secondary-btn:hover {
+  transform: translateY(-1px);
+}
+
+.ms-primary-btn:disabled,
+.ms-secondary-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.ms-status {
+  margin-top: 1rem;
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.ms-status.success {
+  background: rgba(52, 211, 153, 0.15);
+  color: #86efac;
+}
+
+.ms-status.error {
+  background: rgba(248, 113, 113, 0.14);
+  color: #fecaca;
+}
+
+.ms-loading {
+  padding: 2rem;
+  border-radius: 18px;
+  background: rgba(7, 16, 28, 0.65);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  color: var(--ob-muted);
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+@media (max-width: 960px) {
+  .ms-onboarding-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .ms-onboarding-side {
+    border-right: none;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+    padding-right: 0;
+    padding-bottom: 1.6rem;
+  }
+
+  .ms-progress-bar {
+    width: 160px;
+  }
+}
+
+@media (max-width: 640px) {
+  .ms-field-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ms-action-row {
+    flex-direction: column;
+  }
+
+  .ms-primary-btn,
+  .ms-secondary-btn,
+  .ms-ghost-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ms-onboarding-orb,
+  .ms-step-card,
+  .ms-option {
+    animation: none !important;
+    transition: none !important;
+  }
+}

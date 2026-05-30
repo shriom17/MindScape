@@ -3,6 +3,7 @@ from routes.health import health_bp
 from routes.mood import mood_bp
 from routes.stories import stories_bp
 from routes.ml import ml_bp
+from routes.onboarding import onboarding_bp
 
 
 def register_routes(app):
@@ -11,3 +12,4 @@ def register_routes(app):
     app.register_blueprint(mood_bp)
     app.register_blueprint(ml_bp)
     app.register_blueprint(stories_bp)
+    app.register_blueprint(onboarding_bp)

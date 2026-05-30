@@ -69,6 +69,35 @@ const toTitle = (value) => {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
 }
 
+const buildPersonalPrompt = (profile) => {
+  if (!profile) return ''
+  const name = profile.first_name ? String(profile.first_name).trim() : ''
+  const prefix = name ? `Welcome back, ${name}. ` : 'Welcome back. '
+  const profession = String(profile.profession || '').toLowerCase()
+  const difficulties = (profile.difficulties || []).map((item) => String(item).toLowerCase())
+  const goals = (profile.goals || []).map((item) => String(item).toLowerCase())
+
+  const hasDifficulty = (value) => difficulties.includes(String(value).toLowerCase())
+  const hasGoal = (value) => goals.includes(String(value).toLowerCase())
+
+  if (profession === 'student' && (hasDifficulty('work/study pressure') || hasDifficulty('overthinking'))) {
+    return `${prefix}Let's take one small step today. How has study pressure felt this week?`
+  }
+  if (profession === 'working professional' && hasDifficulty('sleep')) {
+    return `${prefix}You mentioned sleep has been difficult lately. Would you like a short calming story tonight?`
+  }
+  if (hasDifficulty('stress') || hasDifficulty('anxiety')) {
+    return `${prefix}Want a 3-minute reset or a gentle breathing check-in?`
+  }
+  if (hasGoal('sleep better')) {
+    return `${prefix}We can help you wind down tonight with a short story or soundscape.`
+  }
+  if (hasGoal('track mood')) {
+    return `${prefix}Ready for a quick mood check-in to keep your streak steady?`
+  }
+  return `${prefix}Let's take one small step today. Want to check in with your mood?`
+}
+
 const formatShortTime = (iso) => {
   if (!iso) return '--'
   const dt = new Date(iso)
@@ -94,6 +123,7 @@ function Dashboard() {
   const [insights, setInsights] = useState(null)
   const [loading, setLoading] = useState(true)
   const [errorMsg, setErrorMsg] = useState('')
+  const [onboarding, setOnboarding] = useState(null)
 
   useEffect(() => {
     let active = true
@@ -111,6 +141,21 @@ function Dashboard() {
       .finally(() => {
         if (!active) return
         setLoading(false)
+      })
+    return () => {
+      active = false
+    }
+  }, [])
+
+  useEffect(() => {
+    let active = true
+    fetchJson('/api/onboarding')
+      .then((data) => {
+        if (!active) return
+        setOnboarding(data?.onboarding || null)
+      })
+      .catch(() => {
+        // ignore onboarding errors
       })
     return () => {
       active = false
@@ -139,6 +184,7 @@ function Dashboard() {
   const latestConfidence = Number(latest?.confidence)
   const latestConfidenceLabel = Number.isFinite(latestConfidence) ? `${latestConfidence.toFixed(1)}%` : 'N/A'
   const trendCount = trendPoints.length
+  const personalPrompt = buildPersonalPrompt(onboarding)
 
   const kpiCards = [
     {
@@ -276,6 +322,41 @@ function Dashboard() {
           .ms-date-text {
             color: var(--ms-muted);
             font-size: 0.9rem;
+          }
+          .ms-personal-card {
+            margin-top: 1.2rem;
+            padding: 1.1rem 1.4rem;
+            border-radius: 18px;
+            border: 1px solid rgba(34, 211, 238, 0.25);
+            background: linear-gradient(120deg, rgba(15, 23, 42, 0.75), rgba(7, 18, 26, 0.85));
+            box-shadow: 0 12px 30px rgba(2, 8, 18, 0.35);
+          }
+          .ms-personal-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 0.4rem;
+          }
+          .ms-personal-badge {
+            padding: 0.25rem 0.7rem;
+            border-radius: 999px;
+            background: rgba(251, 191, 36, 0.18);
+            color: #fbbf24;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+          }
+          .ms-personal-label {
+            color: var(--ms-muted);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+          }
+          .ms-personal-text {
+            color: var(--ms-ink);
+            font-size: 1rem;
+            line-height: 1.6;
           }
           .ms-kpi-grid {
             display: grid;
@@ -538,6 +619,16 @@ function Dashboard() {
               <div className="ms-date-text">{weekdayLabel}</div>
             </div>
           </header>
+
+          {personalPrompt ? (
+            <div className="ms-personal-card">
+              <div className="ms-personal-head">
+                <span className="ms-personal-badge">Keshava</span>
+                <span className="ms-personal-label">Gentle check-in</span>
+              </div>
+              <p className="ms-personal-text">{personalPrompt}</p>
+            </div>
+          ) : null}
 
           <section className="ms-kpi-grid">
             {kpiCards.map((card, index) => (
