@@ -3,16 +3,11 @@ import { pageBgStyles } from '../styles/pageBackground'
 import { supabase, getUser } from '../services/supabaseClient'
 import { fetchJson } from '../services/api'
 
-function calculateAge(dobStr) {
-  if (!dobStr) return null
-  const dob = new Date(dobStr)
-  if (isNaN(dob.getTime())) return null
-  const today = new Date()
-  let age = today.getFullYear() - dob.getFullYear()
-  const m = today.getMonth() - dob.getMonth()
-  if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--
-  return age
-}
+const ageOptions = ['Under 18', '18-24', '25-34', '35+']
+const professionOptions = ['Student', 'Working professional', 'Self-employed', 'Homemaker', 'Other']
+const goalOptions = ['Reduce stress', 'Track mood', 'Sleep better', 'Stay motivated', 'Feel calmer', 'Build consistency']
+
+const normalizeList = (value) => (Array.isArray(value) ? value.filter(Boolean) : [])
 
 function formatUsingTime(createdAt) {
   if (!createdAt) return ''
@@ -34,10 +29,16 @@ function Profile() {
   const [uploading, setUploading] = useState(false)
   const [dailyMood, setDailyMood] = useState('')
   const [dailyMoodTs, setDailyMoodTs] = useState(null)
+  const [onboarding, setOnboarding] = useState(null)
 
   const [formName, setFormName] = useState('')
-  const [formBirthdate, setFormBirthdate] = useState('')
   const [formEmail, setFormEmail] = useState('')
+  const [formAgeRange, setFormAgeRange] = useState('')
+  const [formProfession, setFormProfession] = useState('')
+  const [formGoals, setFormGoals] = useState([])
+  const [formContactName, setFormContactName] = useState('')
+  const [formContactPhone, setFormContactPhone] = useState('')
+  const [formContactRelation, setFormContactRelation] = useState('')
   const [saving, setSaving] = useState(false)
   const [statusMsg, setStatusMsg] = useState('')
 
@@ -52,18 +53,34 @@ function Profile() {
         setAvatarUrl(avatar)
 
         // populate form fields from metadata (signup values)
-        const rawBirth = u?.user_metadata?.birthdate || u?.user_metadata?.dob || ''
-        let isoBirth = ''
-        if (rawBirth) {
-          const d = new Date(rawBirth)
-          if (!isNaN(d.getTime())) isoBirth = d.toISOString().slice(0, 10)
-          else isoBirth = rawBirth
-        }
         setFormName(u?.user_metadata?.full_name || u?.user_metadata?.name || '')
-        setFormBirthdate(isoBirth)
         setFormEmail(u?.email || '')
       } catch (e) {
         // ignore
+      }
+    })()
+
+    return () => { mounted = false }
+  }, [])
+
+  useEffect(() => {
+    let mounted = true
+    ;(async () => {
+      try {
+        const data = await fetchJson('/api/onboarding')
+        if (!mounted) return
+        const onboardingData = data?.onboarding || null
+        setOnboarding(onboardingData)
+        const onboardingName = onboardingData?.first_name
+        if (onboardingName) setFormName(onboardingName)
+        setFormAgeRange(onboardingData?.age_range || '')
+        setFormProfession(onboardingData?.profession || '')
+        setFormGoals(normalizeList(onboardingData?.goals))
+        setFormContactName(onboardingData?.emergency_contact_name || '')
+        setFormContactPhone(onboardingData?.emergency_contact_phone || '')
+        setFormContactRelation(onboardingData?.emergency_contact_relation || '')
+      } catch (e) {
+        // ignore onboarding fetch errors
       }
     })()
 
@@ -146,9 +163,25 @@ function Profile() {
     setStatusMsg('')
     try {
       const updateData = { full_name: formName }
-      if (formBirthdate) updateData.birthdate = formBirthdate
       const { error } = await supabase.auth.updateUser({ data: updateData })
       if (error) throw error
+
+      const onboardingPayload = {
+        first_name: formName,
+        age_range: formAgeRange,
+        profession: formProfession,
+        relationship_status: onboarding?.relationship_status || '',
+        stress_support: onboarding?.stress_support || '',
+        difficulties: Array.isArray(onboarding?.difficulties) ? onboarding.difficulties : [],
+        goals: Array.isArray(formGoals) ? formGoals : [],
+        emergency_contact_name: formContactName,
+        emergency_contact_phone: formContactPhone,
+        emergency_contact_relation: formContactRelation,
+        consent_notify: Boolean(onboarding?.consent_notify),
+        completed: Boolean(onboarding?.completed ?? true),
+      }
+      await fetchJson('/api/onboarding', { method: 'POST', body: JSON.stringify(onboardingPayload) })
+      setOnboarding((prev) => ({ ...(prev || {}), ...onboardingPayload }))
       const fresh = await getUser()
       setUser(fresh)
       setStatusMsg('Profile saved')
@@ -160,13 +193,19 @@ function Profile() {
     }
   }
 
-  const birthdateMeta = user?.user_metadata?.birthdate || user?.user_metadata?.dob || null
-  const age = calculateAge(formBirthdate || birthdateMeta)
   const usingTime = formatUsingTime(user?.created_at)
 
   const MOOD_WINDOW_MS = 24 * 60 * 60 * 1000
   const moodTsParsed = dailyMoodTs ? Date.parse(dailyMoodTs) : null
   const moodIsRecent = moodTsParsed && !isNaN(moodTsParsed) && (Date.now() - moodTsParsed) < MOOD_WINDOW_MS
+  const displayName = formName || ''
+
+  const toggleGoal = (goal) => {
+    setFormGoals((prev) => {
+      if (prev.includes(goal)) return prev.filter((item) => item !== goal)
+      return [...prev, goal]
+    })
+  }
 
   return (
     <div style={pageBgStyles.page}>
@@ -183,7 +222,7 @@ function Profile() {
               {avatarUrl ? (
                 <img src={avatarUrl} alt="avatar" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               ) : (
-                <span style={{ color: '#f59e0b', fontSize: 48, fontWeight: 700 }}>{(formName || 'M').trim().charAt(0).toUpperCase()}</span>
+                <span style={{ color: '#f59e0b', fontSize: 48, fontWeight: 700 }}>{(displayName || 'M').trim().charAt(0).toUpperCase()}</span>
               )}
             </div>
 
@@ -207,15 +246,46 @@ function Profile() {
               <input value={formEmail} readOnly style={{ width: '100%', marginTop: 6, padding: '8px 10px', borderRadius: 8, border: '1px solid rgba(148,163,184,0.04)', background: '#0b1220', color: '#94a3b8' }} />
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 120px', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 12 }}>
               <div>
-                <div style={{ color: '#94a3b8', fontSize: 13 }}>Birthdate</div>
-                <input type="date" value={formBirthdate} onChange={(e) => setFormBirthdate(e.target.value)} style={{ width: '100%', marginTop: 6, padding: '8px 10px', borderRadius: 8, border: '1px solid rgba(148,163,184,0.08)', background: '#07102a', color: '#e2e8f0' }} />
+                <div style={{ color: '#94a3b8', fontSize: 13 }}>Age</div>
+                <select value={formAgeRange} onChange={(e) => setFormAgeRange(e.target.value)} style={{ width: '100%', marginTop: 6, padding: '8px 10px', borderRadius: 8, border: '1px solid rgba(148,163,184,0.08)', background: '#07102a', color: '#e2e8f0' }}>
+                  <option value="">Select age range</option>
+                  {ageOptions.map((option) => (
+                    <option key={option} value={option}>{option}</option>
+                  ))}
+                </select>
               </div>
 
               <div>
-                <div style={{ color: '#94a3b8', fontSize: 13 }}>Age</div>
-                <div style={{ color: '#e2e8f0', marginTop: 6 }}>{age ?? '—'}</div>
+                <div style={{ color: '#94a3b8', fontSize: 13 }}>Profession</div>
+                <select value={formProfession} onChange={(e) => setFormProfession(e.target.value)} style={{ width: '100%', marginTop: 6, padding: '8px 10px', borderRadius: 8, border: '1px solid rgba(148,163,184,0.08)', background: '#07102a', color: '#e2e8f0' }}>
+                  <option value="">Select profession</option>
+                  {professionOptions.map((option) => (
+                    <option key={option} value={option}>{option}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <div style={{ color: '#94a3b8', fontSize: 13 }}>Goals</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 10, marginTop: 6 }}>
+                {goalOptions.map((goal) => (
+                  <label key={goal} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 10px', borderRadius: 10, border: '1px solid rgba(148,163,184,0.12)', background: 'rgba(7, 16, 28, 0.65)', color: '#e2e8f0' }}>
+                    <input type="checkbox" checked={formGoals.includes(goal)} onChange={() => toggleGoal(goal)} />
+                    <span>{goal}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <div style={{ color: '#94a3b8', fontSize: 13 }}>Emergency contact</div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 10, marginTop: 6 }}>
+                <input value={formContactName} onChange={(e) => setFormContactName(e.target.value)} placeholder="Name" style={{ padding: '8px 10px', borderRadius: 8, border: '1px solid rgba(148,163,184,0.08)', background: '#07102a', color: '#e2e8f0' }} />
+                <input value={formContactPhone} onChange={(e) => setFormContactPhone(e.target.value)} placeholder="Phone" style={{ padding: '8px 10px', borderRadius: 8, border: '1px solid rgba(148,163,184,0.08)', background: '#07102a', color: '#e2e8f0' }} />
+                <input value={formContactRelation} onChange={(e) => setFormContactRelation(e.target.value)} placeholder="Relation" style={{ padding: '8px 10px', borderRadius: 8, border: '1px solid rgba(148,163,184,0.08)', background: '#07102a', color: '#e2e8f0' }} />
               </div>
             </div>
 
