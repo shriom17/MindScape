@@ -24,11 +24,13 @@ def setup_rag():
     splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
     chunks = splitter.split_documents(documents)
 
+
     embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
     return FAISS.from_documents(chunks, embeddings)
 
 
-vectorstore = setup_rag()
+# Lazy-initialized vectorstore to avoid importing heavy ML libs at module import time.
+vectorstore = None
 
 
 def _fallback_context(query, k=3):
@@ -56,6 +58,14 @@ def _fallback_context(query, k=3):
 
 
 def get_context(query, k=3):
+    global vectorstore
+    if vectorstore is None:
+        try:
+            vectorstore = setup_rag()
+        except Exception:
+            # If setup fails, ensure we fall back to file-based context.
+            vectorstore = None
+
     if vectorstore is not None:
         relevant_docs = vectorstore.similarity_search(query, k=k)
         return "\n".join([doc.page_content for doc in relevant_docs])
