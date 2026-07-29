@@ -12,7 +12,21 @@ function Home() {
   const [scanComplete, setScanComplete] = useState(false)
   const [cameraOn, setCameraOn] = useState(false)
   const [processingError, setProcessingError] = useState(null)
+  const [username, setUsername] = useState("Friend")
+  useEffect(() => {
+    const getUser = async () => {
+      const { data } = await supabase.auth.getUser()
 
+      if (data.user) {
+        setUsername(
+          data.user.user_metadata?.full_name ||
+          data.user.email?.split("@")[0] ||
+          "Friend"
+        )
+      }
+    }
+
+    getUser()}, []) 
   const startScan = () => {
     setMood(null)
     setScanComplete(false)
@@ -47,7 +61,7 @@ function Home() {
 
       <div className="min-h-screen flex flex-col items-center justify-center gap-8 p-8" style={{ position: 'relative', zIndex: 1 }}>
         <h1 className="text-3xl font-bold text-amber-400">
-          How are you feeling today, Arjuna?
+          How are you feeling today, {username}?
         </h1>
 
         {/* Camera - only show when cameraOn */}
