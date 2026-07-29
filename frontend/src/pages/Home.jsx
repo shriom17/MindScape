@@ -3,6 +3,7 @@ import Camera from '../components/camera'
 import MoodDisplay from '../components/mooddisplay'
 import FloatingChat from '../components/FloatingChat'
 import { pageBgStyles } from '../styles/pageBackground'
+import { supabase } from '../services/supabaseClient'
 
 function Home() {
   const [mood, setMood] = useState(null)

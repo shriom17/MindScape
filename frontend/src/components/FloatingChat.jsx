@@ -1,15 +1,33 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { fetchJson } from '../services/api'
-
+import { supabase } from '../services/supabaseClient'
 function FloatingChat({ mood, isOpen, onOpenChange }) {
+
   const [internalOpen, setInternalOpen] = useState(false)
   const open = typeof isOpen === 'boolean' ? isOpen : internalOpen
   const setOpen = onOpenChange ?? setInternalOpen
+
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
 
-  const sendMessage = async () => {
+  const [username, setUsername] = useState("Friend")
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data } = await supabase.auth.getUser()
+
+      if (data.user) {
+        setUsername(
+          data.user.user_metadata?.full_name ||
+          data.user.email?.split("@")[0] ||
+          "Friend"
+        )
+      }
+    }
+
+    getUser()}, []) 
+    const sendMessage = async () => {
     if (!input.trim()) return
 
     const userMsg = { role: 'user', text: input }
@@ -86,7 +104,7 @@ function FloatingChat({ mood, isOpen, onOpenChange }) {
           }}>
             {messages.length === 0 && (
               <p style={{ color: '#94a3b8', textAlign: 'center', fontSize: '0.85rem' }}>
-                Dear Arjuna, speak your heart...
+                Dear {username}, speak your heart...
               </p>
             )}
             {messages.map((msg, i) => (
