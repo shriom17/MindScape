@@ -98,18 +98,86 @@ const assessmentQuestions = assessmentSections.flatMap((section) =>
 );
 
 const assessmentScale = [1, 2, 3, 4, 5];
+const assessmentStepCount = assessmentQuestions.length;
+
+const checkInPanelStyle = {
+  width: '100%',
+  borderRadius: 28,
+  padding: '1.25rem',
+  background: 'linear-gradient(180deg, rgba(11, 18, 32, 0.92), rgba(8, 15, 26, 0.96))',
+  border: '1px solid rgba(148, 163, 184, 0.16)',
+  boxShadow: '0 24px 60px rgba(2, 6, 23, 0.45)',
+  color: '#f8fafc',
+  backdropFilter: 'blur(14px)',
+}
+
+const checkInHeaderStyle = {
+  display: 'flex',
+  flexWrap: 'wrap',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: 16,
+  borderRadius: 22,
+  padding: '1rem 1.15rem',
+  background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.92))',
+  border: '1px solid rgba(255, 255, 255, 0.08)',
+  boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.05)',
+}
+
+const questionCardStyle = {
+  display: 'grid',
+  gap: 18,
+  borderRadius: 22,
+  padding: '1.05rem 1.1rem',
+  background: 'rgba(15, 26, 51, 0.58)',
+  border: '1px solid rgba(255, 255, 255, 0.1)',
+  boxShadow: '0 12px 30px rgba(2, 6, 23, 0.22)',
+}
+
+const questionLabelStyle = {
+  flex: 1,
+  color: '#f8fafc',
+  fontSize: 15,
+  lineHeight: 1.7,
+}
+
+const scaleButtonBaseStyle = {
+  display: 'grid',
+  placeItems: 'center',
+  width: 44,
+  height: 44,
+  borderRadius: 14,
+  border: '1px solid rgba(255, 255, 255, 0.12)',
+  fontSize: 14,
+  fontWeight: 700,
+  transition: 'transform 160ms ease, border-color 160ms ease, background 160ms ease, color 160ms ease, box-shadow 160ms ease',
+}
+
+const summaryChipStyle = {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 8,
+  padding: '0.5rem 0.8rem',
+  borderRadius: 999,
+  background: 'rgba(255, 255, 255, 0.06)',
+  border: '1px solid rgba(255, 255, 255, 0.08)',
+  color: '#cbd5e1',
+  fontSize: 13,
+}
 
 function Tracker() {
   const [selectedMood, setSelectedMood] = useState("");
   const [note, setNote] = useState("");
   const [message, setMessage] = useState("");
   const [assessmentAnswers, setAssessmentAnswers] = useState({});
+  const [activeQuestionIndex, setActiveQuestionIndex] = useState(0);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [showKeshavaPrompt, setShowKeshavaPrompt] = useState(false);
   const [hasPromptedLowScore, setHasPromptedLowScore] = useState(false);
 
   const answeredCount = Object.keys(assessmentAnswers).length;
-  const totalQuestions = assessmentQuestions.length;
+  const totalQuestions = assessmentStepCount;
+  const activeQuestion = assessmentQuestions[activeQuestionIndex];
   const isAssessmentComplete = answeredCount === totalQuestions;
   const totalScore = assessmentQuestions.reduce((sum, question) => {
     const value = assessmentAnswers[question.id];
@@ -145,8 +213,22 @@ function Tracker() {
 
   const resetAssessment = () => {
     setAssessmentAnswers({});
+    setActiveQuestionIndex(0);
     setShowKeshavaPrompt(false);
     setHasPromptedLowScore(false);
+  };
+
+  const goToQuestion = (nextIndex) => {
+    const normalizedIndex = Math.max(0, Math.min(totalQuestions - 1, nextIndex));
+    setActiveQuestionIndex(normalizedIndex);
+  };
+
+  const goToNextQuestion = () => {
+    goToQuestion(activeQuestionIndex + 1);
+  };
+
+  const goToPreviousQuestion = () => {
+    goToQuestion(activeQuestionIndex - 1);
   };
 
   const handleSave = () => {
@@ -305,81 +387,237 @@ function Tracker() {
               )}
             </div>
 
-            <div className="w-full rounded-2xl border border-white/10 bg-[#0b1220] p-10">
-              <div className="flex flex-wrap items-end justify-between gap-4 rounded-xl bg-[#0f1f3d] px-6 py-4">
-                <div>
-                  <p className="text-xl font-semibold text-white">Daily check-in</p>
-                  <p className="mt-1 text-sm text-slate-200">Low = 1 · High = 5</p>
+            <div style={checkInPanelStyle}>
+              <div style={checkInHeaderStyle}>
+                <div style={{ display: 'grid', gap: 8 }}>
+                  <p style={{ margin: 0, fontSize: 22, fontWeight: 700, color: '#f8fafc', fontFamily: '"Space Grotesk", "Segoe UI", sans-serif' }}>
+                    Daily check-in
+                  </p>
+                  <p style={{ margin: 0, color: '#cbd5e1', fontSize: 14, lineHeight: 1.6 }}>
+                    Low = 1 · High = 5. Quick snapshot of how today feels.
+                  </p>
                 </div>
-                <div className="text-sm text-slate-200">
-                  {answeredCount}/{totalQuestions} answered
+
+                <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'flex-end', gap: 10 }}>
+                  <span style={summaryChipStyle}>{answeredCount}/{totalQuestions} answered</span>
+                  <span style={{ ...summaryChipStyle, color: '#fde68a', borderColor: 'rgba(251, 191, 36, 0.18)' }}>
+                    Mood {assessmentMood?.label ?? '-'}
+                  </span>
                 </div>
               </div>
 
-<div className="mx-auto mt-10 w-full max-w-4xl px-4 sm:px-6 lg:px-8">
-  <div className="flex flex-col gap-6">
-    {assessmentQuestions.map((question) => (
-      <div
-        key={question.id}
-        className="rounded-2xl border border-white/10 bg-[#0f1a33]/50 px-8 py-6"
-      >
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:gap-8">
-          <p className="flex-1 text-base leading-relaxed text-slate-50">
-            {question.label}
-          </p>
+              <div style={{ marginTop: 18, display: 'grid', gap: 14 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+                  <span style={summaryChipStyle}>
+                    Question {activeQuestionIndex + 1} of {totalQuestions}
+                  </span>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <button
+                      type="button"
+                      onClick={goToPreviousQuestion}
+                      disabled={activeQuestionIndex === 0}
+                      style={{
+                        borderRadius: 999,
+                        border: '1px solid rgba(255, 255, 255, 0.12)',
+                        background: activeQuestionIndex === 0 ? 'rgba(255, 255, 255, 0.03)' : 'rgba(255, 255, 255, 0.08)',
+                        padding: '0.7rem 1rem',
+                        color: activeQuestionIndex === 0 ? '#64748b' : '#e2e8f0',
+                        fontSize: 13,
+                        fontWeight: 700,
+                        cursor: activeQuestionIndex === 0 ? 'not-allowed' : 'pointer',
+                      }}
+                    >
+                      Prev
+                    </button>
+                    <button
+                      type="button"
+                      onClick={goToNextQuestion}
+                      disabled={activeQuestionIndex === totalQuestions - 1}
+                      style={{
+                        borderRadius: 999,
+                        border: '1px solid rgba(251, 191, 36, 0.18)',
+                        background: activeQuestionIndex === totalQuestions - 1 ? 'rgba(251, 191, 36, 0.24)' : 'linear-gradient(135deg, #fbbf24, #fb7185)',
+                        padding: '0.7rem 1rem',
+                        color: '#111827',
+                        fontSize: 13,
+                        fontWeight: 800,
+                        cursor: activeQuestionIndex === totalQuestions - 1 ? 'not-allowed' : 'pointer',
+                      }}
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
 
-          <div className="grid grid-cols-5 gap-3">
-            {assessmentScale.map((value) => (
-              <label
-                key={`${question.id}-${value}`}
-                className={`grid h-10 w-10 cursor-pointer place-items-center rounded-md border text-sm font-semibold transition ${
-                  assessmentAnswers[question.id] === value
-                    ? "border-white bg-white text-slate-900"
-                    : "border-white/15 text-slate-200 hover:border-white/40 hover:bg-white/10"
-                }`}
-              >
-                <input
-                  type="radio"
-                  name={`assessment-${question.id}`}
-                  value={value}
-                  checked={assessmentAnswers[question.id] === value}
-                  onChange={(event) =>
-                    handleAssessmentChange(
-                      question.id,
-                      Number(event.target.value)
-                    )
-                  }
-                  className="sr-only"
-                />
-                {value}
-              </label>
-            ))}
-          </div>
-        </div>
-      </div>
-    ))}
-  </div>
-</div>
-              <div className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-white/10 bg-white/5 px-4 py-3">
-                <div>
-                  <p className="text-sm text-slate-300">Mood score</p>
-                  <p className="text-lg font-semibold text-white">
-                    {isAssessmentComplete ? (moodScore ? `${moodScore} / 100` : `${totalScore} / ${maxScore}`) : "Complete all questions"}
-                  </p>
+                <div style={{ overflow: 'hidden', position: 'relative' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      width: `${totalQuestions * 100}%`,
+                      transform: `translateX(-${activeQuestionIndex * (100 / totalQuestions)}%)`,
+                      transition: 'transform 320ms ease',
+                    }}
+                  >
+                    {assessmentQuestions.map((question, index) => {
+                      const isSelected = assessmentAnswers[question.id];
+
+                      return (
+                        <div key={question.id} style={{ width: `${100 / totalQuestions}%`, padding: '0 0.25rem' }}>
+                          <div
+                            style={{
+                              ...questionCardStyle,
+                              minHeight: 260,
+                              justifyContent: 'space-between',
+                            }}
+                          >
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                <span style={{ width: 10, height: 10, borderRadius: 999, background: 'linear-gradient(135deg, #fbbf24, #38bdf8)', boxShadow: '0 0 0 4px rgba(251, 191, 36, 0.08)' }} />
+                                <span style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.35px', color: '#94a3b8' }}>
+                                  {question.section}
+                                </span>
+                              </div>
+                              <p style={questionLabelStyle}>{question.label}</p>
+                              <p style={{ margin: 0, fontSize: 13, color: '#94a3b8' }}>{question.hint}</p>
+                            </div>
+
+                            <div style={{ display: 'grid', gap: 12 }}>
+                              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0, 1fr))', gap: 10, maxWidth: 320, width: '100%' }}>
+                                {assessmentScale.map((value) => {
+                                  const selectedValue = assessmentAnswers[question.id] === value;
+
+                                  return (
+                                    <label
+                                      key={`${question.id}-${value}`}
+                                      style={{
+                                        ...scaleButtonBaseStyle,
+                                        cursor: 'pointer',
+                                        background: selectedValue ? 'linear-gradient(135deg, #fbbf24, #fb7185)' : 'rgba(255, 255, 255, 0.04)',
+                                        borderColor: selectedValue ? 'rgba(251, 191, 36, 0.35)' : 'rgba(255, 255, 255, 0.12)',
+                                        color: selectedValue ? '#111827' : '#e2e8f0',
+                                        boxShadow: selectedValue ? '0 10px 22px rgba(251, 191, 36, 0.22)' : 'none',
+                                        transform: selectedValue ? 'translateY(-1px)' : 'translateY(0)',
+                                      }}
+                                    >
+                                      <input
+                                        type="radio"
+                                        name={`assessment-${question.id}`}
+                                        value={value}
+                                        checked={selectedValue}
+                                        onChange={(event) =>
+                                          handleAssessmentChange(
+                                            question.id,
+                                            Number(event.target.value)
+                                          )
+                                        }
+                                        className="sr-only"
+                                      />
+                                      {value}
+                                    </label>
+                                  );
+                                })}
+                              </div>
+
+                              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, justifyContent: 'space-between', alignItems: 'center' }}>
+                                <button
+                                  type="button"
+                                  onClick={() => goToQuestion(index)}
+                                  style={{
+                                    borderRadius: 999,
+                                    border: '1px solid rgba(255, 255, 255, 0.12)',
+                                    background: 'rgba(255, 255, 255, 0.06)',
+                                    padding: '0.65rem 0.95rem',
+                                    color: '#e2e8f0',
+                                    fontSize: 13,
+                                    fontWeight: 700,
+                                    cursor: 'pointer',
+                                  }}
+                                >
+                                  Stay here
+                                </button>
+                                <span style={{ color: '#94a3b8', fontSize: 13 }}>
+                                  {isSelected ? `Selected: ${isSelected}` : 'Select one value to continue'}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm text-slate-300">Mood</p>
-                  <p className={`text-lg font-semibold ${assessmentMood?.color ?? "text-slate-400"}`}>
-                    {assessmentMood?.label ?? "-"}
-                  </p>
+
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center' }}>
+                  {assessmentQuestions.map((question, index) => {
+                    const isActive = index === activeQuestionIndex;
+                    const isAnswered = Boolean(assessmentAnswers[question.id]);
+
+                    return (
+                      <button
+                        key={question.id}
+                        type="button"
+                        onClick={() => goToQuestion(index)}
+                        aria-label={`Go to question ${index + 1}`}
+                        style={{
+                          width: 12,
+                          height: 12,
+                          borderRadius: 999,
+                          border: 'none',
+                          padding: 0,
+                          cursor: 'pointer',
+                          background: isActive ? 'linear-gradient(135deg, #fbbf24, #fb7185)' : isAnswered ? 'rgba(56, 189, 248, 0.8)' : 'rgba(255, 255, 255, 0.18)',
+                          transform: isActive ? 'scale(1.35)' : 'scale(1)',
+                          boxShadow: isActive ? '0 0 0 5px rgba(251, 191, 36, 0.12)' : 'none',
+                        }}
+                      />
+                    );
+                  })}
                 </div>
-                <button
-                  type="button"
-                  onClick={resetAssessment}
-                  className="rounded-md border border-white/10 bg-white/10 px-4 py-2 text-sm font-semibold text-slate-200 transition hover:border-white/40 hover:bg-white/20"
-                >
-                  Reset
-                </button>
+              </div>
+
+              <div style={{ marginTop: 18, display: 'grid', gap: 14, borderRadius: 20, padding: '1rem 1.1rem', background: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+                  <div>
+                    <p style={{ margin: 0, fontSize: 13, color: '#94a3b8' }}>Mood score</p>
+                    <p style={{ margin: '0.25rem 0 0', fontSize: 18, fontWeight: 700, color: '#f8fafc' }}>
+                      {isAssessmentComplete ? (moodScore ? `${moodScore} / 100` : `${totalScore} / ${maxScore}`) : 'Complete all questions'}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={resetAssessment}
+                    style={{
+                      borderRadius: 999,
+                      border: '1px solid rgba(255, 255, 255, 0.12)',
+                      background: 'rgba(255, 255, 255, 0.06)',
+                      padding: '0.75rem 1rem',
+                      color: '#e2e8f0',
+                      fontSize: 13,
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                    }}
+                  >
+                    Reset
+                  </button>
+                </div>
+
+                <div style={{ display: 'grid', gap: 8 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, color: '#cbd5e1' }}>
+                    <span>Progress</span>
+                    <span>{Math.round((answeredCount / totalQuestions) * 100)}%</span>
+                  </div>
+                  <div style={{ height: 10, borderRadius: 999, overflow: 'hidden', background: 'rgba(255, 255, 255, 0.06)', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+                    <div
+                      style={{
+                        width: `${(answeredCount / totalQuestions) * 100}%`,
+                        height: '100%',
+                        borderRadius: 999,
+                        background: 'linear-gradient(90deg, #fbbf24, #38bdf8)',
+                        transition: 'width 220ms ease',
+                      }}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
