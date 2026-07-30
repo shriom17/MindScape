@@ -18,7 +18,7 @@ def chat():
         return {"error": "No message provided"}, 400
 
     context = get_context(user_message, k=3)
-    reply = generate_response(user_message, context)
+    reply = generate_response(user_message, context, mood)
 
     db = SessionLocal()
     log = ChatLog(user_message=user_message, krishna_response=reply, mood=mood)
