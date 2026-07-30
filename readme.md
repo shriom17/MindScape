@@ -1,189 +1,160 @@
-# 🧠 MindScape — Your Everyday Mental Wellness Companion
+# MindScape 🧠
 
-MindScape is an AI-powered mental wellness web app designed to help users understand their emotions, reduce stress, and build healthier habits through simple daily check-ins.
+MindScape is an AI-powered mental wellness platform that analyzes user interactions and emotional patterns to provide personalized wellness recommendations and motivational guidance inspired by ancient wisdom texts like the Bhagavad Gita.
 
-It combines **mood tracking**, **calming stories**, **music therapy**, and a gentle AI companion named **Keshava**, inspired by the wisdom of the Bhagavad Gita.
+The platform combines AI-driven conversational support, mood analysis, and Retrieval-Augmented Generation (RAG) to deliver meaningful and context-aware experiences for users.
 
-Built with privacy and accessibility in mind, MindScape supports users with small daily actions that feel calming, supportive, and easy to maintain.
+### Chat Interface
 
----
+![Chat Screenshot](./frontend/src/assets/chat.png)
 
-## ✨ Why MindScape?
+### Dashboard
 
-Mental wellness support should feel simple and approachable.
+![Dashboard Screenshot](./frontend/src/assets/dashboard.png)
 
-MindScape helps users:
 
-🧠 Track emotions through daily check-ins and mood scans
-📖 Read calming stories based on their mood
-🎵 Listen to relaxing music for stress relief
-💬 Talk with **Keshava**, an AI companion for gentle guidance
-📊 Build healthy habits with streaks and progress insights
-🆘 Access helplines and real-world professional support when needed
+## ✨ Features
 
----
+- AI-based conversational support
+- Retrieval-Augmented Generation (RAG) for contextual responses
+- Semantic search using FAISS vector database
+- Mood and emotion analysis using DeepFace
+- Facial analysis with OpenCV
+- User authentication using Supabase
+- Personalized dashboard experience
+- Fallback retrieval mechanism for reliable responses
+- Responsive and user-friendly interface
 
-## 🚀 Features
 
-### 😊 Mood Tracking
-
-* Daily mood selection
-* Quick self-assessment
-* Notes & reflections
-* Mood score generation
-* Weekly mood trends
-
-### 📷 AI Mood Scan
-
-* Camera-based emotion detection
-* Optional computer vision analysis
-* Countdown + instant mood results
-
-### 💬 Keshava AI Companion
-
-* Gentle supportive conversations
-* Personalized emotional guidance
-* Positive suggestions inspired by Bhagavad Gita values
-
-### 📖 Story Library
-
-* Mood-based calming stories
-* Trending & recommended stories
-* Save, like, and continue reading
-
-### 🎵 Music Therapy
-
-* Curated relaxing tracks
-* Jamendo music integration
-* Mini player controls
-
-### 📊 Dashboard & Insights
-
-* Mood averages
-* Daily streak tracking
-* Consistency score
-* Recent scan history
-* Trend visualization
-
-### 👤 Profile
-
-* Avatar upload
-* Personal details
-* Daily mood badge
-
-### 🆘 Helpline Directory
-
-* Psychologists & counselors
-* Support guidance notes
-* Easy access during difficult moments
-
----
-
-## 🗺 Pages Overview
-
-| Route        | Purpose                   |
-| ------------ | ------------------------- |
-| `/`          | Login                     |
-| `/register`  | Registration + onboarding |
-| `/home`      | Mood scan + Keshava chat  |
-| `/dashboard` | Insights & trends         |
-| `/tracker`   | Daily mood check-in       |
-| `/stories`   | Story library             |
-| `/music`     | Music therapy             |
-| `/profile`   | User profile              |
-| `/helpline`  | Mental health support     |
-
----
-
-## 🛠 Tech Stack
+## 🛠️ Tech Stack
 
 ### Frontend
-
-* React 19
-* Vite
-* React Router
-* Tailwind CSS
+- React.js
+- Vite
+- JavaScript
 
 ### Backend
+- Flask
+- Python
+- REST API
 
-* Flask
-* SQLAlchemy
-* SQLite
+### AI/ML
+- LangChain
+- HuggingFace Embeddings
+- FAISS Vector Database
+- DeepFace
+- OpenCV
 
-### Optional AI / ML
+### Database & Services
+- Supabase
 
-* Groq
-* LangChain
-* FAISS
-* DeepFace
-* Hugging Face Inference
 
----
+## 🚀 Installation & Setup
 
-## ⚡ Quick Start
+### Clone Repository
 
-### 1. Install dependencies
+```bash
+git clone <repository-url>
+cd MindScape
+```
+
+## Frontend Setup
 
 ```bash
 cd frontend
 npm install
-
-cd ../backend
-pip install -r requirements.txt
-```
-
-### 2. Run backend
-
-```bash
-cd backend
-python app.py
-```
-
-### 3. Run frontend
-
-```bash
-cd frontend
 npm run dev
 ```
 
----
-
-## 🤖 Optional ML Features
-
-Install full ML support:
+## Backend Setup
 
 ```bash
 cd backend
-pip install -r requirements-ml.txt
+pip install -r requirements.txt
+python app.py
 ```
 
----
 
-## 🌱 Future Enhancements
+## 🔐 Environment Variables
 
-* Emergency support alerts
-* Personalized meditation suggestions
-* Better AI mood analysis
-* Weekly emotional wellness reports
-* Voice-based Keshava conversations
+Create a `.env` file inside the frontend folder:
 
----
+```env
+VITE_SUPABASE_URL=your-supabase-url
+VITE_SUPABASE_ANON_KEY=your-anon-key
+VITE_API_BASE_URL=http://127.0.0.1:5000
+```
 
-## 🔐 Privacy First
+Create a `.env` file inside the backend folder:
 
-MindScape is built to feel safe and supportive.
+```env
+SUPABASE_URL=your-supabase-url
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+```
 
-* Private daily mood tracking
-* User-controlled data
-* Optional AI analysis
-* Encourages professional help when needed
+**Note:** Never expose your Supabase service role key in frontend code.
 
----
 
-## 📄 License
+## 🧠 AI Workflow
 
-Add your preferred license here.
+```
+User Input
+    ↓
+Flask Backend API
+    ↓
+LangChain RAG Pipeline
+    ↓
+Text Retrieval using FAISS
+    ↓
+Relevant Context Generation
+    ↓
+AI Response
 
----
+Camera/Image Input
+    ↓
+OpenCV Processing
+    ↓
+DeepFace Emotion Analysis
+    ↓
+Mood Detection
+    ↓
+Personalized Experience
+```
 
-Made with ❤️ to support everyday mental wellness.
+
+## 📂 Folder Structure
+
+```
+MindScape/
+│
+├── frontend/
+│   ├── src/
+│   ├── public/
+│   └── package.json
+│
+├── backend/
+│   ├── app.py
+│   ├── routes/
+│   ├── models/
+│   └── requirements.txt
+│
+├── gita_data/
+│   └── gita.txt
+│
+└── README.md
+```
+
+
+## 🔮 Future Improvements
+
+- Browser extension integration for analyzing digital wellness patterns
+- Social media usage insights from platforms like Facebook and WhatsApp
+- Long-term mood trend analysis based on user activity patterns
+- More personalized recommendations using behavioral insights
+
+## 👨‍💻 Author
+
+**Shriom Pal**
+
+GitHub:  
+https://github.com/shriom17
