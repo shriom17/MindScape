@@ -63,7 +63,7 @@ function FloatingChat({ mood, isOpen, onOpenChange }) {
           boxShadow: '0 4px 15px rgba(199, 181, 67, 0.49)',
           zIndex: 1000
         }}>
-        🪈
+        ✦
       </button>
 
       {/* Chat Window */}
@@ -90,7 +90,7 @@ function FloatingChat({ mood, isOpen, onOpenChange }) {
             fontWeight: 'bold',
             textAlign: 'center'
           }}>
-            🪷 Keshava
+            Keshava
           </div>
 
           {/* Messages */}
@@ -104,7 +104,7 @@ function FloatingChat({ mood, isOpen, onOpenChange }) {
           }}>
             {messages.length === 0 && (
               <p style={{ color: '#94a3b8', textAlign: 'center', fontSize: '0.85rem' }}>
-                Dear {username}, speak your heart...
+                Hello {username}, I am here with you. Share what is on your mind.
               </p>
             )}
             {messages.map((msg, i) => (
@@ -120,9 +120,7 @@ function FloatingChat({ mood, isOpen, onOpenChange }) {
                 {msg.text}
               </div>
             ))}
-            {loading && (
-              <p style={{ color: '#94a3b8', fontSize: '0.8rem' }}>Krishna is speaking...</p>
-            )}
+            {loading && <p style={{ color: '#94a3b8', fontSize: '0.8rem' }}>Keshava is listening...</p>}
           </div>
 
           {/* Input */}
@@ -131,7 +129,7 @@ function FloatingChat({ mood, isOpen, onOpenChange }) {
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && sendMessage()}
-              placeholder="Speak to Krishna..."
+              placeholder="Share what is on your mind..."
               style={{
                 flex: 1,
                 background: '#0f3460',
@@ -153,7 +151,7 @@ function FloatingChat({ mood, isOpen, onOpenChange }) {
                 color: '#f59e0b',
                 cursor: 'pointer'
               }}>
-              🙏
+              Send
             </button>
           </div>
         </div>
