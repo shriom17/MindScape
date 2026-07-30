@@ -1,46 +1,164 @@
-# React + Vite
+# MindScape 🧠
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+MindScape is an AI-powered mental wellness application that provides users with an interactive space for emotional support, contextual conversations, and mood analysis. The application combines AI-based retrieval techniques and facial emotion recognition to deliver personalized experiences.
 
-Currently, two official plugins are available:
+## 📸 Screenshots
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+### Chat Interface
 
-## React Compiler
+![Chat Screenshot](./assets/chat.png)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Dashboard
 
-## Expanding the ESLint configuration
+![Dashboard Screenshot](./assets/dashboard.png)
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
 
-## Supabase setup
+## ✨ Features
 
-1. Create a Supabase project and note the project URL and anon/public key.
-2. Add the following env variables to `frontend/.env`:
+- AI-based conversational support
+- Retrieval-Augmented Generation (RAG) for contextual responses
+- Semantic search using FAISS vector database
+- Mood and emotion analysis using DeepFace
+- Facial analysis with OpenCV
+- User authentication using Supabase
+- Personalized dashboard experience
+- Fallback retrieval mechanism for reliable responses
+- Responsive and user-friendly interface
 
+
+## 🛠️ Tech Stack
+
+### Frontend
+- React.js
+- Vite
+- JavaScript
+
+### Backend
+- Flask
+- Python
+- REST API
+
+### AI/ML
+- LangChain
+- HuggingFace Embeddings
+- FAISS Vector Database
+- DeepFace
+- OpenCV
+
+### Database & Services
+- Supabase
+
+
+## 🚀 Installation & Setup
+
+### Clone Repository
+
+```bash
+git clone <repository-url>
+cd MindScape
 ```
+
+## Frontend Setup
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+## Backend Setup
+
+```bash
+cd backend
+pip install -r requirements.txt
+python app.py
+```
+
+
+## 🔐 Environment Variables
+
+Create a `.env` file inside the frontend folder:
+
+```env
 VITE_SUPABASE_URL=your-supabase-url
 VITE_SUPABASE_ANON_KEY=your-anon-key
 VITE_API_BASE_URL=http://127.0.0.1:5000
 ```
 
-3. On the backend, set these in `backend/.env` (or your deployment environment):
+Create a `.env` file inside the backend folder:
 
-```
+```env
 SUPABASE_URL=your-supabase-url
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key  # server-only
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 ```
 
-4. Install frontend dependency and backend requirements:
+**Note:** Never expose your Supabase service role key in frontend code.
 
-```bash
-cd frontend
-npm install
 
-cd ../backend
-pip install -r requirements.txt
+## 🧠 AI Workflow
+
+```
+User Input
+    ↓
+Flask Backend API
+    ↓
+LangChain RAG Pipeline
+    ↓
+Text Retrieval using FAISS
+    ↓
+Relevant Context Generation
+    ↓
+AI Response
+
+Camera/Image Input
+    ↓
+OpenCV Processing
+    ↓
+DeepFace Emotion Analysis
+    ↓
+Mood Detection
+    ↓
+Personalized Experience
 ```
 
-5. Configure OAuth redirect URLs in the Supabase dashboard if you use Google sign-in.
+
+## 📂 Folder Structure
+
+```
+MindScape/
+│
+├── frontend/
+│   ├── src/
+│   ├── public/
+│   └── package.json
+│
+├── backend/
+│   ├── app.py
+│   ├── routes/
+│   ├── models/
+│   └── requirements.txt
+│
+├── gita_data/
+│   └── gita.txt
+│
+├── assets/
+│   ├── chat.png
+│   └── dashboard.png
+│
+└── README.md
+```
+
+
+## 🔮 Future Improvements
+
+- Better personalization using user history
+- Improved emotion recognition accuracy
+- Mobile application support
+
+
+## 👨‍💻 Author
+
+**Shriom Pal**
+
+GitHub:  
+https://github.com/shriom17
