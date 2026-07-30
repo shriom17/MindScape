@@ -1,16 +1,16 @@
 # MindScape 🧠
 
-MindScape is an AI-powered mental wellness application that provides users with an interactive space for emotional support, contextual conversations, and mood analysis. The application combines AI-based retrieval techniques and facial emotion recognition to deliver personalized experiences.
+MindScape is an AI-powered mental wellness platform that analyzes user interactions and emotional patterns to provide personalized wellness recommendations and motivational guidance inspired by ancient wisdom texts like the Bhagavad Gita.
 
-## 📸 Screenshots
+The platform combines AI-driven conversational support, mood analysis, and Retrieval-Augmented Generation (RAG) to deliver meaningful and context-aware experiences for users.
 
 ### Chat Interface
 
-![Chat Screenshot](./assets/chat.png)
+![Chat Screenshot](./frontend/src/assets/chat.png)
 
 ### Dashboard
 
-![Dashboard Screenshot](./assets/dashboard.png)
+![Dashboard Screenshot](./frontend/src/assets/dashboard.png)
 
 
 ## ✨ Features
@@ -141,20 +141,16 @@ MindScape/
 ├── gita_data/
 │   └── gita.txt
 │
-├── assets/
-│   ├── chat.png
-│   └── dashboard.png
-│
 └── README.md
 ```
 
 
 ## 🔮 Future Improvements
 
-- Better personalization using user history
-- Improved emotion recognition accuracy
-- Mobile application support
-
+- Browser extension integration for analyzing digital wellness patterns
+- Social media usage insights from platforms like Facebook and WhatsApp
+- Long-term mood trend analysis based on user activity patterns
+- More personalized recommendations using behavioral insights
 
 ## 👨‍💻 Author
 
