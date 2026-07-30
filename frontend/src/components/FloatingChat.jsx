@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { fetchJson } from '../services/api'
 import { supabase } from '../services/supabaseClient'
+import FeatherIcon from '../assets/peakok-feather.png';
 function FloatingChat({ mood, isOpen, onOpenChange }) {
 
   const [internalOpen, setInternalOpen] = useState(false)
@@ -50,20 +51,36 @@ function FloatingChat({ mood, isOpen, onOpenChange }) {
       <button
         onClick={() => setOpen(!open)}
         style={{
-          position: 'fixed',
-          bottom: '2rem',
-          right: '2rem',
-          width: '60px',
-          height: '60px',
-          borderRadius: '50%',
-          background: 'linear-gradient(135deg, #040d27, #5a83c1)',
-          border: 'none',
-          cursor: 'pointer',
-          fontSize: '1.5rem',
-          boxShadow: '0 4px 15px rgba(199, 181, 67, 0.49)',
-          zIndex: 1000
-        }}>
-        ✦
+            position: 'fixed',
+            bottom: '2rem',
+            right: '2rem',
+            width: '70px',
+            height: '70px',
+            borderRadius: '50%',
+            background:
+              'linear-gradient(145deg, #06152f 0%, #14396d 55%, #2c5aa0 100%)',
+            border: '2px solid rgba(255,215,0,0.25)',
+            cursor: 'pointer',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            boxShadow:
+'0                      10px 30px rgba(0,0,0,.35), 0 0 18px rgba(90,131,193,.45), 0 0 22px rgba(255,215,0,.22)',
+            transition:'transform .25s ease, box-shadow .25s ease',
+            overflow: 'hidden',
+            zIndex: 1000
+          }}>
+         <img
+        src={FeatherIcon}
+        alt="Keshava"
+        style={{
+          width: "100px",
+          height: "100px",
+          objectFit: "contain",
+          pointerEvents: "none",
+          filter: "drop-shadow(0 0 8px rgba(255,215,0,.35))"
+        }}
+      />
       </button>
 
       {/* Chat Window */}
@@ -151,7 +168,7 @@ function FloatingChat({ mood, isOpen, onOpenChange }) {
                 color: '#f59e0b',
                 cursor: 'pointer'
               }}>
-              Send
+              ►
             </button>
           </div>
         </div>
