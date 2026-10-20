@@ -1,6 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { signUpWithEmail, signInWithEmail, signInWithGoogle, getUser, supabase } from "../services/supabaseClient";
+import {
+  signUpWithEmail,
+  signInWithEmail,
+  resetPasswordForEmail,
+  signInWithGoogle,
+  getUser,
+  supabase,
+} from "../services/supabaseClient";
 import { fetchJson } from "../services/api";
 import heroImage from "../assets/loginbg.png";
 
@@ -18,6 +25,7 @@ function Register() {
   const [isError, setIsError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState("signup");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const routeAfterLogin = useCallback(async () => {
     try {
@@ -65,10 +73,22 @@ function Register() {
 
   useEffect(() => {
     let mounted = true;
+    const recoveryLink = window.location.hash.includes("type=recovery");
+    if (recoveryLink) {
+      setMode("reset");
+    }
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY" && mounted) {
+        setMode("reset");
+        setMessage("");
+      }
+    });
+
     ;(async () => {
       try {
         const user = await getUser();
-        if (mounted && user?.id) {
+        if (mounted && user?.id && !recoveryLink) {
           await routeAfterLogin();
         }
       } catch (e) {
@@ -77,6 +97,7 @@ function Register() {
     })();
     return () => {
       mounted = false;
+      authListener?.subscription?.unsubscribe();
     };
   }, [navigate, routeAfterLogin]);
 
@@ -93,7 +114,18 @@ function Register() {
   const handleAuth = async (e) => {
     e.preventDefault();
 
-    if (mode === "signup") {
+    if (mode === "reset") {
+      if (!password.trim() || !confirmPassword.trim()) {
+        setIsError(true);
+        setMessage("Enter and confirm your new password.");
+        return;
+      }
+      if (password !== confirmPassword) {
+        setIsError(true);
+        setMessage("Passwords do not match.");
+        return;
+      }
+    } else if (mode === "signup") {
       if (!name.trim()) {
         setIsError(true);
         setMessage("Name is required.");
@@ -112,9 +144,14 @@ function Register() {
       }
     }
 
-    if (!email.trim() || !password.trim()) {
+    if (mode !== "reset" && !email.trim()) {
       setIsError(true);
-      setMessage("Email and password are required.");
+      setMessage("Email is required.");
+      return;
+    }
+    if (mode !== "forgot" && !password.trim()) {
+      setIsError(true);
+      setMessage("Password is required.");
       return;
     }
 
@@ -135,9 +172,31 @@ function Register() {
     setMessage("");
 
     try {
-      if (mode === "signup") {
-        const { data, error } = await signUpWithEmail(email.trim(), password);
+      if (mode === "forgot") {
+        const { error } = await resetPasswordForEmail(email.trim().toLowerCase());
         if (error) throw error;
+        setIsError(false);
+        setMessage("If an account exists for this email, a password reset link has been sent.");
+        return;
+      }
+
+      if (mode === "reset") {
+        const { error } = await supabase.auth.updateUser({ password });
+        if (error) throw error;
+        setIsError(false);
+        setMessage("Password updated. You can now log in.");
+        setPassword("");
+        setConfirmPassword("");
+        setMode("login");
+        return;
+      }
+
+      if (mode === "signup") {
+        const { data, error } = await signUpWithEmail(email.trim().toLowerCase(), password);
+        if (error) throw error;
+        if (!data?.user || (data.user.identities && data.user.identities.length === 0)) {
+          throw new Error("An account with this email already exists. Please log in or use Forgot password.");
+        }
         setIsError(false);
         setMessage("Sign-up successful. Check your email if confirmation is required.");
         // try to save name and birthdate into user metadata (works if session is active)
@@ -160,7 +219,7 @@ function Register() {
         setPassword("");
         navigate('/onboarding');
       } else {
-        const { data, error } = await signInWithEmail(email.trim(), password);
+        const { data, error } = await signInWithEmail(email.trim().toLowerCase(), password);
         if (error) throw error;
         setIsError(false);
         setMessage("Login successful.");
@@ -257,7 +316,7 @@ function Register() {
             marginBottom: "1rem",
           }}
         >
-          <button
+          {mode !== "reset" && <button
             type="button"
             onClick={() => {
               setMode("signup");
@@ -276,7 +335,8 @@ function Register() {
           >
             Sign Up
           </button>
-          <button
+          }
+          {mode !== "reset" && <button
             type="button"
             onClick={() => {
               setMode("login");
@@ -295,9 +355,10 @@ function Register() {
           >
             Login
           </button>
+          }
         </div>
 
-        <div style={{ marginBottom: "1rem" }}>
+        {mode !== "forgot" && mode !== "reset" && <div style={{ marginBottom: "1rem" }}>
           <button
             type="button"
             onClick={() => signInWithGoogle()}
@@ -314,10 +375,10 @@ function Register() {
           >
             Continue with Google
           </button>
-        </div>
+        </div>}
 
         <h2 style={{ marginTop: 0, marginBottom: "1rem", color: "#f59e0b" }}>
-          {mode === "signup" ? "Create Account" : "Welcome Back"}
+          {mode === "signup" ? "Create Account" : mode === "forgot" ? "Reset Password" : mode === "reset" ? "Set New Password" : "Welcome Back"}
         </h2>
         {mode === "signup" && (
           <>
@@ -381,25 +442,44 @@ function Register() {
           }}
         />
 
-        <label style={{ display: "block", marginBottom: "0.35rem" }} htmlFor="password">
-          Password
-        </label>
-        <input
-          id="password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          autoComplete={mode === "signup" ? "new-password" : "current-password"}
-          style={{
-            width: "100%",
-            marginBottom: "1rem",
-            padding: "0.7rem",
-            borderRadius: 8,
-            border: "1px solid #334155",
-            background: "#0f172a",
-            color: "#e2e8f0",
-          }}
-        />
+        {mode !== "forgot" && <>
+          <label style={{ display: "block", marginBottom: "0.35rem" }} htmlFor="password">
+            {mode === "reset" ? "New password" : "Password"}
+          </label>
+          <input
+            id="password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoComplete={mode === "signup" ? "new-password" : "current-password"}
+            style={{
+              width: "100%",
+              marginBottom: "1rem",
+              padding: "0.7rem",
+              borderRadius: 8,
+              border: "1px solid #334155",
+              background: "#0f172a",
+              color: "#e2e8f0",
+            }}
+          />
+          {mode === "reset" && <input
+            type="password"
+            aria-label="Confirm new password"
+            placeholder="Confirm new password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            autoComplete="new-password"
+            style={{
+              width: "100%",
+              marginBottom: "1rem",
+              padding: "0.7rem",
+              borderRadius: 8,
+              border: "1px solid #334155",
+              background: "#0f172a",
+              color: "#e2e8f0",
+            }}
+          />}
+        </>}
 
         <button
           type="submit"
@@ -415,8 +495,30 @@ function Register() {
             cursor: loading ? "not-allowed" : "pointer",
           }}
         >
-          {loading ? (mode === "signup" ? "Registering..." : "Logging in...") : mode === "signup" ? "Register" : "Login"}
+          {loading
+            ? mode === "signup" ? "Registering..." : mode === "forgot" ? "Sending..." : mode === "reset" ? "Updating..." : "Logging in..."
+            : mode === "signup" ? "Register" : mode === "forgot" ? "Send reset link" : mode === "reset" ? "Update password" : "Login"}
         </button>
+
+        {mode === "login" && (
+          <button
+            type="button"
+            onClick={() => {
+              setMode("forgot");
+              setMessage("");
+            }}
+            style={{
+              width: "100%",
+              marginTop: "0.75rem",
+              border: "none",
+              background: "transparent",
+              color: "#fbbf24",
+              cursor: "pointer",
+            }}
+          >
+            Forgot password?
+          </button>
+        )}
 
         {message && (
           <p

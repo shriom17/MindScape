@@ -13,6 +13,12 @@ export async function signInWithEmail(email, password) {
   return await supabase.auth.signInWithPassword({ email, password })
 }
 
+export async function resetPasswordForEmail(email) {
+  return await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${window.location.origin}/register`,
+  })
+}
+
 export async function signInWithGoogle() {
   return await supabase.auth.signInWithOAuth({ provider: 'google' })
 }
