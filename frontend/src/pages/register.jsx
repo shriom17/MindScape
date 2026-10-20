@@ -261,6 +261,7 @@ function Register() {
       }}
     >
       <div
+        className="login-hero"
         style={{
           flex: "1 1 420px",
           minHeight: 500,
@@ -270,25 +271,38 @@ function Register() {
           boxShadow: "0 8px 24px rgba(0, 0, 0, 0.09)",
           position: "relative",
           overflow: "hidden",
-          backgroundImage: `linear-gradient(130deg, rgba(4, 13, 39, 0.8), rgba(15, 23, 42, 0.72)), url(${heroImage})`,
-          backgroundSize: "contain",
+          backgroundImage: `linear-gradient(130deg, rgba(2, 6, 23, 0.72), rgba(8, 15, 45, 0.58)), url(${heroImage})`,
+          backgroundSize: "cover",
           backgroundRepeat: "no-repeat",
           backgroundPosition: "center",
           backgroundColor: "#577ced",
           display: "flex",
-          alignItems: "flex-end",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
         <div
+          className="login-hero-content"
           style={{
-            padding: "0.4rem",
+            padding: "1.25rem 1.5rem",
             color: "#e2e8f0",
-            width: "100%",
-            background: "linear-gradient(0deg, rgba(2, 6, 23, 0.8), rgba(2, 6, 23, 0.02))",
+            width: "min(88%, 430px)",
+            textAlign: "center",
           }}
         >
-          <h1 style={{ margin: 0, color: "#f59e0b", fontSize: "1.8rem" }}>MindScape</h1>
-          <p style={{ marginTop: "0.45rem", marginBottom: 0, lineHeight: 2.5 }}>
+          <h1
+            className="login-hero-title"
+            style={{
+              margin: 0,
+              color: "#ffd166",
+              fontSize: "clamp(2.4rem, 6vw, 4.2rem)",
+              letterSpacing: "0.06em",
+              lineHeight: 1.05,
+            }}
+          >
+            MindScape
+          </h1>
+          <p style={{ marginTop: "0.65rem", marginBottom: 0, lineHeight: 1.6 }}>
             Your calm space starts here. Sign up or log in to continue your mood journey.
           </p>
         </div>

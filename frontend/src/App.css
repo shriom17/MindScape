@@ -1,0 +1,67 @@
+.login-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(3, 7, 18, 0.1) 12%, rgba(3, 7, 18, 0.58) 100%);
+  pointer-events: none;
+}
+
+.login-hero-content {
+  position: relative;
+  z-index: 1;
+  border: 1px solid rgba(255, 220, 130, 0.45);
+  border-radius: 18px;
+  background: rgba(10, 18, 45, 0.42);
+  box-shadow: 0 12px 35px rgba(3, 7, 18, 0.28), 0 0 35px rgba(245, 158, 11, 0.14);
+  backdrop-filter: blur(3px);
+  animation: login-hero-entry 900ms ease-out both, login-hero-float 5s ease-in-out 1s infinite;
+}
+
+.login-hero-title {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  text-shadow:
+    0 0 8px rgba(255, 209, 102, 0.95),
+    0 0 22px rgba(245, 158, 11, 0.72),
+    0 4px 12px rgba(0, 0, 0, 0.85);
+  animation: login-title-glow 2.8s ease-in-out infinite;
+}
+
+@keyframes login-title-glow {
+  0%, 100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.2);
+  }
+}
+
+@keyframes login-hero-entry {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes login-hero-float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-hero-content {
+    animation: none;
+  }
+
+  .login-hero-title {
+    animation: none;
+  }
+}
