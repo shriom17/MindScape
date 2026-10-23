@@ -87,9 +87,9 @@ function AppLayout() {
   return (
     <>
       <Navbar />
-      <div style={{ display: 'flex' }}>
+      <div className="mindscape-app-shell" style={{ display: 'flex' }}>
         {!isRegisterPage && <Sidebar />}
-        <div style={{ flex: 1 }}>
+        <div className="mindscape-page-content" style={{ flex: 1 }}>
           <Routes>
             <Route path="/" element={<Register />} />
             <Route path="/home" element={<Home />} />

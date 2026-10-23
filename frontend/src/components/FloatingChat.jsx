@@ -49,6 +49,7 @@ function FloatingChat({ mood, isOpen, onOpenChange }) {
     <>
       {/* Floating Button */}
       <button
+        className="floating-chat-button"
         onClick={() => setOpen(!open)}
         style={{
             position: 'fixed',
@@ -85,7 +86,7 @@ function FloatingChat({ mood, isOpen, onOpenChange }) {
 
       {/* Chat Window */}
       {open && (
-        <div style={{
+        <div className="floating-chat-window" style={{
           position: 'fixed',
           bottom: '6rem',
           right: '2rem',

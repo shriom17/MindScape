@@ -192,7 +192,7 @@ function Camera({ onMoodDetected, onError, active = true }) {
   }, [active, captureFrame, stopCamera])
 
   return (
-    <div style={{
+    <div className="mood-camera" style={{
       borderRadius: '16px',
       padding: '6px',
       background: 'linear-gradient(135deg, #040d27, #5a83c1)',
@@ -202,7 +202,7 @@ function Camera({ onMoodDetected, onError, active = true }) {
         <p className="text-red-400 p-4">{error}</p>
       ) : (
         <>
-          <video ref={videoRef} autoPlay muted
+          <video className="mood-camera-video" ref={videoRef} autoPlay muted
             style={{ width: '400px', height: '300px', borderRadius: '12px', objectFit: 'cover' }} />
           <canvas ref={canvasRef} style={{ display: 'none' }} />
           {serverError && (

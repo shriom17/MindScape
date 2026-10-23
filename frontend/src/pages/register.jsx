@@ -249,6 +249,7 @@ function Register() {
 
   return (
     <div
+      className="login-page"
       style={{
         minHeight: "calc(100vh - 72px)",
         display: "flex",
@@ -261,7 +262,7 @@ function Register() {
       }}
     >
       <div
-        className="login-hero"
+        className="login-hero login-page-hero"
         style={{
           flex: "1 1 420px",
           minHeight: 500,
@@ -309,6 +310,7 @@ function Register() {
       </div>
 
       <form
+        className="login-form"
         onSubmit={handleAuth}
         style={{
           flex: "1 1 360px",

@@ -50,10 +50,10 @@ const navItems = [
 function Sidebar() {
   return (
     <div
-      className="w-70 min-h-screen bg-gradient-to-b from-[#0b112d] via-[#112e6a] to-[#0b112d] text-white p-5 shadow-[0_30px_60px_rgba(8,12,35,0.6)] border-r border-white/10"
+      className="mindscape-sidebar w-70 min-h-screen bg-gradient-to-b from-[#0b112d] via-[#112e6a] to-[#0b112d] text-white p-5 shadow-[0_30px_60px_rgba(8,12,35,0.6)] border-r border-white/10"
     >
       {/* Menu */}
-      <ul className="flex flex-col gap-6">
+      <ul className="mindscape-sidebar-list flex flex-col gap-6">
         {navItems.map((item) => (
           <SidebarItem
             key={item.to}

@@ -75,7 +75,7 @@ function Navbar() {
   }, [menuOpen])
 
   return (
-    <nav style={{
+    <nav className="mindscape-navbar" style={{
       background: 'linear-gradient(135deg, #040d27, #5a83c1, #07246a)',
       padding: '1rem 2rem',
       display: 'flex',

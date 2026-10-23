@@ -1,5 +1,5 @@
-@import "tailwindcss";
 @import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@400;600;700&display=swap");
+@import "tailwindcss";
 :root {
   --bg-primary: #1a1a2e;
   --bg-surface: #16213e;
@@ -26,4 +26,230 @@ body {
   background-color: var(--bg-primary);
   color: var(--text-primary);
   font-family: var(--font-body);
+  overflow-x: hidden;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+img,
+video,
+iframe {
+  max-width: 100%;
+}
+
+.mindscape-page-content {
+  min-width: 0;
+}
+
+.login-page {
+  width: 100%;
+}
+
+@media (max-width: 760px) {
+  .mindscape-navbar {
+    padding: 0.75rem 1rem !important;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .mindscape-navbar > div:first-child {
+    font-size: 1.2rem !important;
+  }
+
+  .mindscape-navbar > div:last-child {
+    gap: 0.5rem !important;
+  }
+
+  .mindscape-navbar button,
+  .mindscape-navbar a {
+    padding: 0.45rem 0.65rem !important;
+    font-size: 0.85rem;
+  }
+
+  .mindscape-sidebar {
+    width: 100% !important;
+    min-height: 0 !important;
+    padding: 0.5rem !important;
+    border-right: 0 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    position: sticky;
+    top: 0;
+    z-index: 20;
+  }
+
+  .mindscape-sidebar-list {
+    flex-direction: row !important;
+    gap: 0.4rem !important;
+    overflow-x: auto;
+    padding-bottom: 0.15rem;
+    scrollbar-width: thin;
+  }
+
+  .mindscape-sidebar-list > li {
+    flex: 0 0 auto;
+  }
+
+  .mindscape-sidebar-list a {
+    gap: 0.45rem !important;
+    padding: 0.45rem 0.65rem !important;
+    border-radius: 0.8rem !important;
+  }
+
+  .mindscape-sidebar-list a > span:first-child {
+    width: 2rem !important;
+    height: 2rem !important;
+    border-radius: 0.65rem !important;
+  }
+
+  .mindscape-sidebar-list a > span:nth-child(2) {
+    font-size: 0.78rem !important;
+  }
+
+  .mindscape-sidebar-list a > span:last-child {
+    display: none;
+  }
+
+  .mindscape-app-shell {
+    display: block !important;
+  }
+
+  .login-page {
+    min-height: calc(100vh - 64px) !important;
+    padding: 0.75rem !important;
+    gap: 0.75rem !important;
+    align-items: stretch !important;
+  }
+
+  .login-page-hero {
+    flex: 0 0 auto !important;
+    width: 100% !important;
+    min-height: 230px !important;
+    max-width: none !important;
+  }
+
+  .login-hero-content {
+    width: min(92%, 430px) !important;
+    padding: 1rem !important;
+  }
+
+  .login-hero-title {
+    font-size: clamp(2rem, 12vw, 3.2rem) !important;
+  }
+
+  .login-form {
+    width: 100% !important;
+    max-width: none !important;
+    padding: 1rem !important;
+    align-self: stretch !important;
+  }
+
+  .login-form input,
+  .login-form button {
+    min-height: 44px;
+  }
+
+  .mood-camera {
+    width: min(100%, 420px);
+  }
+
+  .mood-camera-video {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 4 / 3;
+  }
+
+  .floating-chat-button {
+    width: 56px !important;
+    height: 56px !important;
+    right: 1rem !important;
+    bottom: 1rem !important;
+  }
+
+  .floating-chat-button img {
+    width: 78px !important;
+    height: 78px !important;
+  }
+
+  .floating-chat-window {
+    width: min( calc(100vw - 2rem), 360px) !important;
+    height: min(70vh, 420px) !important;
+    right: 1rem !important;
+    bottom: 4.75rem !important;
+  }
+
+  .ms-onboarding {
+    padding: 1rem 0.75rem 2rem !important;
+  }
+
+  .ms-onboarding-shell {
+    padding: 1rem !important;
+    border-radius: 16px !important;
+    gap: 1rem !important;
+  }
+
+  .ms-onboarding-side {
+    gap: 0.8rem !important;
+    padding-bottom: 1rem !important;
+  }
+
+  .ms-stepper {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0.35rem !important;
+  }
+
+  .ms-step {
+    display: block !important;
+    padding: 0.45rem !important;
+    text-align: center;
+  }
+
+  .ms-step-index {
+    margin: 0 auto 0.25rem;
+  }
+
+  .ms-step-title,
+  .ms-step-subtitle {
+    display: none;
+  }
+
+  .ms-step-card {
+    padding: 1rem !important;
+  }
+
+  .ms-top-row {
+    align-items: stretch !important;
+    flex-direction: column;
+  }
+
+  .ms-progress-bar {
+    width: 100% !important;
+  }
+
+  .ms-option-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .page-shell,
+  [style*="maxWidth"] {
+    max-width: 100% !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .mindscape-navbar > div:last-child button {
+    display: none;
+  }
+
+  .mindscape-navbar > div:last-child {
+    margin-left: auto;
+  }
+
+  .ms-option-grid {
+    grid-template-columns: 1fr;
+  }
 }
