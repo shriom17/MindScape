@@ -296,30 +296,31 @@ function Music() {
       <div style={{ ...pageBgStyles.orbBase, ...pageBgStyles.orbLeft }} />
       <div style={{ ...pageBgStyles.orbBase, ...pageBgStyles.orbRight }} />
 
-      <section style={styles.shell}>
-        <header style={styles.hero}>
+      <section className="music-shell" style={styles.shell}>
+        <header className="music-hero" style={styles.hero}>
           <p style={styles.eyebrow}>MindScape Audio</p>
           <h2 style={styles.title}>Music Lounge</h2>
           <p style={styles.subtitle}>
             A mood-aware Spotify space that reads your latest detected emotion and shifts the playlist to match the moment.
           </p>
-          <div style={styles.metaRow}>
+          <div className="music-meta-row" style={styles.metaRow}>
             <div style={styles.pill}>Detected mood: {toTitleCase(currentMood?.emotion || 'neutral')}</div>
             <div style={styles.pill}>Source: {moodSource}</div>
             <div style={styles.pill}>Confidence: {confidenceLabel}</div>
           </div>
         </header>
 
-        <div style={styles.grid}>
-          <article style={{ ...styles.card, ...styles.cardAccent }}>
+        <div className="music-grid" style={styles.grid}>
+          <article className="music-card" style={{ ...styles.card, ...styles.cardAccent }}>
             <p style={styles.sectionLabel}>Spotify playlist</p>
             <h3 style={styles.playlistTitle}>{playlist.title}</h3>
             <p style={styles.description}>{playlist.description}</p>
 
-            <div style={styles.iframeShell}>
+            <div className="music-iframe-shell" style={styles.iframeShell}>
               <iframe
                 title={`${playlist.title} playlist for ${currentMood?.emotion || 'neutral'} mood`}
                 src={embedSrc}
+                className="music-iframe"
                 style={styles.iframe}
                 allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                 loading="lazy"
@@ -327,14 +328,14 @@ function Music() {
             </div>
           </article>
 
-          <aside style={{ ...styles.card, ...styles.helperCard }}>
+          <aside className="music-card music-helper-card" style={{ ...styles.card, ...styles.helperCard }}>
             <p style={styles.sectionLabel}>Mood bridge</p>
             <h3 style={{ margin: 0, fontSize: '1.2rem', color: '#f8fbff' }}>How the match works</h3>
             <p style={styles.helperText}>
               Music tailored to your current mood. MindScape automatically recommends playlists based on your latest mood analysis.
             </p>
 
-            <div style={styles.infoList}>
+            <div className="music-info-list" style={styles.infoList}>
               <div style={styles.infoItem}>
                 <div>Current playlist</div>
                 <div style={styles.infoValue}>{playlist.title}</div>
