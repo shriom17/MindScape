@@ -267,6 +267,127 @@ iframe {
     gap: 0.85rem !important;
   }
 
+  .ms-dashboard {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 1.25rem !important;
+    border-radius: 20px !important;
+  }
+
+  .ms-dashboard .ms-header {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .ms-dashboard .ms-title {
+    font-size: clamp(1.7rem, 8vw, 2.15rem);
+    line-height: 1.12;
+  }
+
+  .ms-dashboard .ms-subtitle {
+    line-height: 1.55;
+  }
+
+  .ms-dashboard .ms-date {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    text-align: left;
+  }
+
+  .ms-dashboard .ms-date-pill {
+    width: fit-content;
+    padding: 0.4rem 0.7rem;
+  }
+
+  .ms-dashboard .ms-personal-card {
+    margin-top: 1.25rem;
+    padding: 1rem;
+  }
+
+  .ms-dashboard .ms-personal-text {
+    line-height: 1.55;
+  }
+
+  .ms-dashboard .ms-kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.7rem;
+    margin-top: 1.25rem;
+  }
+
+  .ms-dashboard .ms-card {
+    padding: 0.9rem;
+    border-radius: 16px;
+  }
+
+  .ms-dashboard .ms-kpi-top {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+
+  .ms-dashboard .ms-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.07em;
+  }
+
+  .ms-dashboard .ms-value {
+    font-size: 1.25rem;
+    line-height: 1.2;
+    margin-top: 0.5rem;
+    overflow-wrap: anywhere;
+  }
+
+  .ms-dashboard .ms-meta {
+    font-size: 0.78rem;
+    line-height: 1.4;
+  }
+
+  .ms-dashboard .ms-grid {
+    gap: 1rem;
+    margin-top: 1.25rem;
+  }
+
+  .ms-dashboard .ms-chart-top {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  .ms-dashboard .ms-pill {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  .ms-dashboard .ms-spark {
+    height: 110px;
+    gap: 4px;
+  }
+
+  .ms-dashboard .ms-chart-meta {
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    line-height: 1.4;
+  }
+
+  .ms-dashboard .ms-timeline-item {
+    grid-template-columns: 1fr;
+    gap: 0.35rem;
+  }
+
+  .ms-dashboard .ms-time {
+    font-size: 0.75rem;
+  }
+
+  .ms-dashboard .ms-action {
+    padding: 0.8rem 0.9rem;
+  }
+
+  .ms-dashboard .ms-ring {
+    margin: 0 auto;
+  }
+
   .ms-onboarding {
     padding: 1rem 0.75rem 2rem !important;
   }
